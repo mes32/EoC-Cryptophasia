@@ -6,11 +6,11 @@
 # Clone this repository
 git clone https://github.com/mes32/EoC-Cryptophasia
 
-# Build the jarfile using Gradle
+# Build the jarfile with Gradle
 cd EoC-Cryptophasia
 ./gradlew build
 
-# Start the program with Java 8
+# Launch the game (using Java 8)
 java -jar build/libs/launch-game.jar
 ```
 
