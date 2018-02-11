@@ -12,16 +12,30 @@ import java.util.*;
 
 public class DateServer {
 
-    private static final int PORT_NUMBER = 9090;
+    //private static final int PORT_NUMBER = 9090;
 
     DateServer() {
+
+        // String externalInetAddress = ExternalAddressService.whatIsMyIp();
+        // if (externalInetAddress == null) {
+        //     externalInetAddress = "";
+        // }
+
+        Scanner scan = new Scanner(System.in);
+
+        int portNumber = 0;
+        String externalInetAddress = null;
 
         try {
             InetAddress ipLocalHost = InetAddress.getLocalHost();
 
             System.out.println();
-            System.out.println("IP Address: " + ipLocalHost.getHostAddress());
-            System.out.println("Port Number: " + PORT_NUMBER);
+            System.out.println("Local IP Address: " + ipLocalHost.getHostAddress());
+            System.out.println("External IP Address: " + "?");
+            System.out.print("Port Number: ");
+
+            portNumber = scan.nextInt();
+
             System.out.println();
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -29,7 +43,7 @@ public class DateServer {
         }
 
         try {
-            ServerSocket listener = new ServerSocket(PORT_NUMBER);
+            ServerSocket listener = new ServerSocket(portNumber);
             while (true) {
                 Socket socket = listener.accept();
                 try {
