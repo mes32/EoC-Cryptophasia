@@ -26,20 +26,28 @@ public class DateClient {
         System.out.print("Server Port: ");
         int serverPort = scan.nextInt();
 
+        System.out.println();
 
-        try {
-            // String serverAddress = JOptionPane.showInputDialog(
-            //     "Enter IP Address of a machine that is\n" +
-            //     "running the date service on port " + PORT_NUMBER + ":");
-            Socket s = new Socket(serverAddress, serverPort);
-            BufferedReader input =
-                new BufferedReader(new InputStreamReader(s.getInputStream()));
-            String answer = input.readLine();
+        while (true) {
 
-            System.out.println();
-            System.out.println(" -- from server -- " + answer);
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.out.print("> ");
+            String message = scan.nextLine();
+
+            try {
+                // String serverAddress = JOptionPane.showInputDialog(
+                //     "Enter IP Address of a machine that is\n" +
+                //     "running the date service on port " + PORT_NUMBER + ":");
+                Socket socket = new Socket(serverAddress, serverPort);
+
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                out.println(message);
+
+                BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String answer = input.readLine();
+                System.out.println(" -- " + answer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
