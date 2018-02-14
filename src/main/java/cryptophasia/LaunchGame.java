@@ -10,22 +10,33 @@ import java.io.*;
 import java.util.*;
 
 public class LaunchGame {
-    public static void main(String[] args) {
+    private static final int SELECT_SERVER = 1;
+    private static final int SELECT_MONITOR = 2;
+    private static final int SELECT_CLIENT = 3;
 
+    public static void main(String[] args) {
+        showTitle();
+        int choice = menuPrompt();
+        startSelected(choice);
+    }
+
+    private static void showTitle() {
         System.out.println();
         System.out.println();
         System.out.println();
         System.out.println("+-----------------------------------+");
         System.out.println("| Engines of Creation: Cryptophasia |");
         System.out.println("+-----------------------------------+");
+    }
 
+    private static int menuPrompt() {
         Scanner scan = new Scanner(System.in);
         int choice = 0;
-        boolean validChoice = false;
-        while (!validChoice) {
+        while (true) {
             System.out.println();
-            System.out.println("  1. Run as server");
-            System.out.println("  2. Run as client");
+            System.out.println("  1. Start server");
+            System.out.println("  2. Connect w/ monitor");
+            System.out.println("  3. Connect w/ chat client");
             System.out.println();
             System.out.print("> ");
 
@@ -35,15 +46,19 @@ public class LaunchGame {
                 scan.nextLine();
             }
 
-            if (choice == 1 || choice == 2) {
-                validChoice = true;
-                if (choice == 1) {
-                    new DateServer();
-                }
-                if (choice == 2) {
-                    new DateClient();
-                }
+            if (choice == SELECT_SERVER || choice == SELECT_MONITOR || choice == SELECT_CLIENT) {
+                return choice;
             }
+        }
+    }
+
+    private static void startSelected(int choice) {
+        if (choice == SELECT_SERVER) {
+            new ChatServer();
+        } else if (choice == SELECT_MONITOR) {
+            new ChatMonitor();
+        } else if (choice == SELECT_CLIENT) {
+            new ChatClient();
         }
     }
 }
