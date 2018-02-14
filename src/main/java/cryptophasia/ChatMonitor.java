@@ -1,7 +1,7 @@
 /*
     ChatMonitor.java
 
-    Displays chats from the ChatServer
+    Displays a feed of messages from the ChatServer
  */
 
 package cryptophasia;

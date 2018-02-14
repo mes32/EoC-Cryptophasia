@@ -81,7 +81,7 @@ public class ChatClient {
     private String userNamePrompt() {
         Scanner scan = new Scanner(System.in);
         System.out.print("username: ");
-        String userName = scan.next();
+        String userName = scan.nextLine();
         return userName;
     }
 }

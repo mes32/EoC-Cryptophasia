@@ -1,7 +1,7 @@
 /*
     ChatServer.java
 
-    Simple date server class
+    A terminal-based multi-user instant messaging server
  */
 
 package cryptophasia;
@@ -15,6 +15,7 @@ public class ChatServer {
     public static final String MONITOR_TOKEN = "MONITOR";
     public static final String CLIENT_TOKEN = "CLIENT";
 
+    private int userCount = 0;
     private ArrayList<PrintWriter> printWriters = new ArrayList<PrintWriter>();
 
     ChatServer() {
@@ -29,13 +30,6 @@ public class ChatServer {
                     Socket socket = listener.accept();
                     display(" + Socket connection accepted");
                     new SwitchHandler(socket, this).start();
-                    // BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    // String connectionTypeToken = in.readLine();
-                    // if (connectionTypeToken.equals(MONITOR_TOKEN)) {
-                    //     display(" + New MONITOR added");
-                    // } else {
-                    //     display(" + Invalid connection was dropped");
-                    // }
                 } catch (IOException e) {
                     display(" + Socket connection refused");
                 }
@@ -48,35 +42,11 @@ public class ChatServer {
                 System.exit(1);
             }
         }
+    }
 
-        /*try {
-            while (true) {
-                Scanner scan = new Scanner(System.in);
-                Socket socket = listener.accept();
-                try {
-                    String dateString = new Date().toString();
-
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
-                    String input = in.readLine();
-                    System.out.println(" -- " + input);
-
-                    System.out.print("> ");
-                    String message = scan.nextLine();
-                    out.println(message);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                } finally {
-                    socket.close();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }*/
+    public int incrementUsers() {
+        userCount++;
+        return userCount;
     }
 
     public void addWriter(PrintWriter writer) {
@@ -143,12 +113,18 @@ public class ChatServer {
     }
 
     private static class SwitchHandler extends Thread {
+        private static final String ANSI_RESET = "\u001B[0m";
+        private static final String ANSI_RED = "\u001B[31m";
+        private static final String ANSI_GREEN = "\u001B[32m";
+        private static final String ANSI_BLUE = "\u001B[34m";
+
         private Socket socket;
         private ChatServer server;
         private BufferedReader in;
         private PrintWriter out;
 
         private String userName;
+        private int number;
 
         public SwitchHandler(Socket socket, ChatServer server) {
             this.socket = socket;
@@ -167,17 +143,30 @@ public class ChatServer {
                 } else if (connectionType.equals(CLIENT_TOKEN)) {
                     server.display(" + New CLIENT added");
                     userName = in.readLine();
-                    server.display(" + " + userName + " joined chat server");
-
+                    number = server.incrementUsers();
+                    String colorCode = getColorCode(number);
+                    server.display(" + " + colorCode + userName + ANSI_RESET + " joined chat server");
+                    
                     String message = in.readLine();
                     while (message != null && !message.equals(".")) {
-                        server.display(userName + "> " + message);
+                        server.display(colorCode + userName + ANSI_RESET + ": " + message);
                         message = in.readLine();
                     }
                 }
             } catch (IOException e) {
 
             }
+        }
+
+        private String getColorCode(int number) {
+            if (number % 3 == 0) {
+                return ANSI_GREEN;
+            } else if (number % 3 == 1) {
+                return ANSI_BLUE;
+            } else if (number % 3 == 2) {
+                return ANSI_RED;
+            }
+            return "";
         }
     }           
 }
