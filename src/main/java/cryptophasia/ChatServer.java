@@ -147,10 +147,17 @@ public class ChatServer {
                     String colorCode = getColorCode(number);
                     server.display(" + " + colorCode + userName + ANSI_RESET + " joined chat server");
                     
-                    String message = in.readLine();
-                    while (message != null && !message.equals(".")) {
-                        server.display(colorCode + userName + ANSI_RESET + ": " + message);
-                        message = in.readLine();
+                    String message;
+                    while (true) {
+                        try {
+                            message = in.readLine();
+                            if (message == null || message.equals(".")) {
+                                break;
+                            }
+                            server.display(colorCode + userName + ANSI_RESET + ": " + message);
+                        } catch (IOException e) {
+                            server.display(" + ERROR: IOException reading from " + colorCode + userName + ANSI_RESET + ".");
+                        }
                     }
                 }
             } catch (IOException e) {
