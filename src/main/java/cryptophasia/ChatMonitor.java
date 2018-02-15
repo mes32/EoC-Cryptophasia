@@ -9,8 +9,13 @@ package cryptophasia;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import javax.sound.sampled.*;
 
 public class ChatMonitor {
+
+    private static final String AUDIO_INDICATOR_NAME = "/sound60.wav";
+
+    private Clip audioIndicator;
 
     ChatMonitor() {
         Socket socket = connectWithServer();
@@ -21,12 +26,29 @@ public class ChatMonitor {
                 if (message == null) {
                     break;
                 }
+                playAudioIndicator();
                 System.out.println(message);
             } catch (IOException e) {
                 e.printStackTrace();
                 System.err.println("ERROR: ChatMonitor was unable to read message from the server.");
                 System.exit(1);
             }
+        }
+    }
+
+    private void playAudioIndicator() {
+        try {
+            InputStream inputStream = getClass().getResourceAsStream(AUDIO_INDICATOR_NAME); 
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(bufferedInputStream);
+            AudioFormat format = audioStream.getFormat();
+            DataLine.Info info = new DataLine.Info(Clip.class, format);
+
+            audioIndicator = (Clip) AudioSystem.getLine(info);
+            audioIndicator.open(audioStream);
+            audioIndicator.start();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
