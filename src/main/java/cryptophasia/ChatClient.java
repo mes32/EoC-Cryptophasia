@@ -6,29 +6,51 @@
 
 package cryptophasia;
 
+import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import javax.swing.*;
 
 public class ChatClient {
 
     private String userName;
 
+    JFrame frame;
+    JTextField textField;
+
     ChatClient() {
         Socket socket = connectWithServer();
         PrintWriter outputStream = setupOutputStream(socket);
 
-        Scanner scan = new Scanner(System.in);
-        while (true) {
-            
-            System.out.print("> ");
-            String message = scan.nextLine();
-            outputStream.println(message);
+        frame = new JFrame("Chat Client - Message Input (" + userName + ")");
+        textField = new JTextField(40);
 
-            if (message.equals(".")) {
-                break;
+        textField.setEditable(true);
+        frame.getContentPane().add(textField);
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+
+        textField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                outputStream.println(textField.getText());
+                textField.setText("");
             }
-        }
+        });
+
+        // Scanner scan = new Scanner(System.in);
+        // while (true) {
+            
+        //     System.out.print("> ");
+        //     String message = scan.nextLine();
+        //     outputStream.println(message);
+
+        //     if (message.equals(".")) {
+        //         break;
+        //     }
+        // }
     }
 
     private Socket connectWithServer() {
