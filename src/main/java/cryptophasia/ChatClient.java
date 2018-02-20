@@ -12,23 +12,30 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.text.*;
 
 public class ChatClient {
 
     private String userName;
 
     JFrame frame;
+    JTextArea messageDisplay;
     JTextField textField;
 
     ChatClient() {
         Socket socket = connectWithServer();
+        BufferedReader inputStream = setupInputStream(socket);
         PrintWriter outputStream = setupOutputStream(socket);
 
-        frame = new JFrame("Chat Client - Message Input (" + userName + ")");
+        frame = new JFrame("Chat Client (" + userName + ")");
+        messageDisplay = new JTextArea(14, 40);
         textField = new JTextField(40);
 
+        messageDisplay.setEditable(false);
+        messageDisplay.setLineWrap(true);
         textField.setEditable(true);
-        frame.getContentPane().add(textField);
+        frame.getContentPane().add(new JScrollPane(messageDisplay, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), "North");
+        frame.getContentPane().add(textField, "South");
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -39,6 +46,19 @@ public class ChatClient {
                 textField.setText("");
             }
         });
+
+        while (true) {
+            try {
+                String message = inputStream.readLine();
+                messageDisplay.append(message + "\n");
+                messageDisplay.setCaretPosition(messageDisplay.getDocument().getLength());
+            } catch (IOException e) {
+                e.printStackTrace();
+                messageDisplay.append("<IOException> Could not read message\n");
+                messageDisplay.setCaretPosition(messageDisplay.getDocument().getLength());
+            }
+        }
+
 
         // Scanner scan = new Scanner(System.in);
         // while (true) {
@@ -72,6 +92,18 @@ public class ChatClient {
             System.exit(1);
         }
         return socket;
+    }
+
+    private BufferedReader setupInputStream(Socket socket) {
+        BufferedReader inputStream = null;
+        try {
+            inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("ERROR: ChatClient was unable to obtain input stream from the server.");
+            System.exit(1);
+        }
+        return inputStream;
     }
 
     private PrintWriter setupOutputStream(Socket socket) {

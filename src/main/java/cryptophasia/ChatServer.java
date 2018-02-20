@@ -141,11 +141,12 @@ public class ChatServer {
                     server.addWriter(out);
                     server.display(" + New MONITOR added");
                 } else if (connectionType.equals(CLIENT_TOKEN)) {
+                    server.addWriter(out);
                     server.display(" + New CLIENT added");
                     userName = in.readLine();
                     number = server.incrementUsers();
                     String colorCode = getColorCode(number);
-                    server.display(" + " + colorCode + userName + ANSI_RESET + " joined chat server");
+                    server.display(" + " + userName + " joined chat server");
                     
                     String message;
                     while (true) {
@@ -154,9 +155,9 @@ public class ChatServer {
                             if (message == null || message.equals(".")) {
                                 break;
                             }
-                            server.display(colorCode + userName + ANSI_RESET + ": " + message);
+                            server.display(userName + ": " + message);
                         } catch (IOException e) {
-                            server.display(" + ERROR: IOException reading from " + colorCode + userName + ANSI_RESET + ".");
+                            server.display(" + ERROR: IOException reading from " + userName + ".");
                         }
                     }
                 }
