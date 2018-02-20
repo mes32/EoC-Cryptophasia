@@ -11,9 +11,8 @@ import java.net.*;
 import java.util.*;
 
 public class ChatServer {
-
-    public static final String MONITOR_TOKEN = "MONITOR";
-    public static final String CLIENT_TOKEN = "CLIENT";
+    public static final String SUBMITNAME = "SUBMITNAME";
+    public static final String NAMEACCEPT = "NAMEACCEPT";
 
     private int userCount = 0;
     private ArrayList<PrintWriter> printWriters = new ArrayList<PrintWriter>();
@@ -29,7 +28,7 @@ public class ChatServer {
                 try {
                     Socket socket = listener.accept();
                     display(" + Socket connection accepted");
-                    new SwitchHandler(socket, this).start();
+                    new ClientHandler(socket, this).start();
                 } catch (IOException e) {
                     display(" + Socket connection refused");
                 }
@@ -42,11 +41,6 @@ public class ChatServer {
                 System.exit(1);
             }
         }
-    }
-
-    public int incrementUsers() {
-        userCount++;
-        return userCount;
     }
 
     public void addWriter(PrintWriter writer) {
@@ -112,12 +106,7 @@ public class ChatServer {
         }
     }
 
-    private static class SwitchHandler extends Thread {
-        private static final String ANSI_RESET = "\u001B[0m";
-        private static final String ANSI_RED = "\u001B[31m";
-        private static final String ANSI_GREEN = "\u001B[32m";
-        private static final String ANSI_BLUE = "\u001B[34m";
-
+    private static class ClientHandler extends Thread {
         private Socket socket;
         private ChatServer server;
         private BufferedReader in;
@@ -126,7 +115,7 @@ public class ChatServer {
         private String userName;
         private int number;
 
-        public SwitchHandler(Socket socket, ChatServer server) {
+        public ClientHandler(Socket socket, ChatServer server) {
             this.socket = socket;
             this.server = server;
         }
@@ -136,45 +125,29 @@ public class ChatServer {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
 
-                String connectionType = in.readLine();
-                if (connectionType.equals(MONITOR_TOKEN)) {
-                    server.addWriter(out);
-                    server.display(" + New MONITOR added");
-                } else if (connectionType.equals(CLIENT_TOKEN)) {
-                    server.addWriter(out);
-                    server.display(" + New CLIENT added");
-                    userName = in.readLine();
-                    number = server.incrementUsers();
-                    String colorCode = getColorCode(number);
-                    server.display(" + " + userName + " joined chat server");
-                    
-                    String message;
-                    while (true) {
-                        try {
-                            message = in.readLine();
-                            if (message == null || message.equals(".")) {
-                                break;
-                            }
-                            server.display(userName + ": " + message);
-                        } catch (IOException e) {
-                            server.display(" + ERROR: IOException reading from " + userName + ".");
+                server.display(" + New CLIENT added");
+                out.println(ChatServer.SUBMITNAME);
+                userName = in.readLine();
+                out.println(ChatServer.NAMEACCEPT);
+                server.addWriter(out);
+                server.display(" + " + userName + " joined chat server");
+
+                String message;
+                while (true) {
+                    try {
+                        message = in.readLine();
+                        if (message == null || message.equals(".")) {
+                            server.display(" + " + userName + " left chat server");
+                            break;
                         }
+                        server.display(userName + ": " + message);
+                    } catch (IOException e) {
+                        server.display(" + ERROR: IOException reading from " + userName + ".");
                     }
                 }
             } catch (IOException e) {
 
             }
-        }
-
-        private String getColorCode(int number) {
-            if (number % 3 == 0) {
-                return ANSI_GREEN;
-            } else if (number % 3 == 1) {
-                return ANSI_BLUE;
-            } else if (number % 3 == 2) {
-                return ANSI_RED;
-            }
-            return "";
         }
     }           
 }

@@ -18,74 +18,78 @@ public class ChatClient {
 
     private String userName;
 
-    JFrame frame;
-    JTextArea messageDisplay;
-    JTextField textField;
+    private JFrame frame = new JFrame("Chat Client");
+    private JTextArea messageDisplay = new JTextArea(14, 40);
+    private JTextField textField = new JTextField(40);
 
     ChatClient() {
         Socket socket = connectWithServer();
         BufferedReader inputStream = setupInputStream(socket);
         PrintWriter outputStream = setupOutputStream(socket);
 
-        frame = new JFrame("Chat Client (" + userName + ")");
-        messageDisplay = new JTextArea(14, 40);
-        textField = new JTextField(40);
-
-        messageDisplay.setEditable(false);
-        messageDisplay.setLineWrap(true);
-        textField.setEditable(true);
-        frame.getContentPane().add(new JScrollPane(messageDisplay, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), "North");
-        frame.getContentPane().add(textField, "South");
-        frame.pack();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        configMessageDisplay();
+        configTextField(outputStream);
+        configFrame();
         frame.setVisible(true);
 
+        String message;
+        try {
+            message = inputStream.readLine();
+            if (message.equals(ChatServer.SUBMITNAME)) {
+                do {
+                    userName = userNameDialog();
+                    outputStream.println(userName);
+                    message = inputStream.readLine();
+                } while(!message.equals(ChatServer.NAMEACCEPT));
+            }
+
+            textField.setEditable(true);
+            frame.setTitle("Chat Client - " + userName);
+
+            while (true) {
+                message = inputStream.readLine();
+                messageDisplay.append(message + "\n");
+                messageDisplay.setCaretPosition(messageDisplay.getDocument().getLength());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private void configMessageDisplay() {
+        messageDisplay.setEditable(false);
+        messageDisplay.setLineWrap(true);
+    }
+
+    private void configTextField(PrintWriter out) {
+        textField.setEditable(false);
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                outputStream.println(textField.getText());
+                out.println(textField.getText());
                 textField.setText("");
             }
         });
+    }
 
-        while (true) {
-            try {
-                String message = inputStream.readLine();
-                messageDisplay.append(message + "\n");
-                messageDisplay.setCaretPosition(messageDisplay.getDocument().getLength());
-            } catch (IOException e) {
-                e.printStackTrace();
-                messageDisplay.append("<IOException> Could not read message\n");
-                messageDisplay.setCaretPosition(messageDisplay.getDocument().getLength());
-            }
-        }
-
-
-        // Scanner scan = new Scanner(System.in);
-        // while (true) {
-            
-        //     System.out.print("> ");
-        //     String message = scan.nextLine();
-        //     outputStream.println(message);
-
-        //     if (message.equals(".")) {
-        //         break;
-        //     }
-        // }
+    private void configFrame() {
+        JScrollPane scrollPane = new JScrollPane(messageDisplay, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        frame.getContentPane().add(scrollPane, "North");
+        frame.getContentPane().add(textField, "South");
+        frame.pack();
+        frame.setResizable(false);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     private Socket connectWithServer() {
         System.out.println();
         String serverAddress = serverAddressPrompt();
         int serverPortNumber = serverPortNumberPrompt();
-        userName = userNamePrompt();
         System.out.println();
 
         Socket socket = null;
         try {
             socket = new Socket(serverAddress, serverPortNumber);
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            out.println(ChatServer.CLIENT_TOKEN);
-            out.println(userName);
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("ERROR: ChatClient was unable to connect with the server.");
@@ -132,10 +136,12 @@ public class ChatClient {
         return serverPortNumber;
     }
 
-    private String userNamePrompt() {
-        Scanner scan = new Scanner(System.in);
-        System.out.print("username: ");
-        String userName = scan.nextLine();
+    private String userNameDialog() {
+        String userName = JOptionPane.showInputDialog(
+            frame,
+            "Enter username:",
+            "Username Dialog",
+            JOptionPane.PLAIN_MESSAGE);
         return userName;
     }
 }
