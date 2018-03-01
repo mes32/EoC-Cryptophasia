@@ -21,6 +21,7 @@ public class ChatClient {
     private JFrame frame = new JFrame("Chat Client");
     private JTextArea messageDisplay = new JTextArea(14, 40);
     private JTextField textField = new JTextField(40);
+    private ChatAudioIndicator soundIndicator = new ChatAudioIndicator();
 
     ChatClient() {
         System.out.println();
@@ -60,6 +61,7 @@ public class ChatClient {
 
             while (true) {
                 message = inputStream.readLine();
+                soundIndicator.play();
                 messageDisplay.append(message + "\n");
                 messageDisplay.setCaretPosition(messageDisplay.getDocument().getLength());
             }
