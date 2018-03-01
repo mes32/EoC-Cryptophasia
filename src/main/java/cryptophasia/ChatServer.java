@@ -16,13 +16,17 @@ public class ChatServer {
 
     private int userCount = 0;
     private ArrayList<PrintWriter> printWriters = new ArrayList<PrintWriter>();
+    private int portNumber;
+    private ServerSocket listener;
 
     ChatServer() {
         String internalAddress = getInternalAddress();
         String externalAddress = getExternalAddress();
-        int portNumber = portNumberPrompt(internalAddress, externalAddress);
-        ServerSocket listener = openConnection(portNumber);
+        portNumber = portNumberPrompt(internalAddress, externalAddress);
+        listener = openConnection(portNumber);
+    }
 
+    public void run() {
         try {
             while (true) {
                 try {
@@ -104,6 +108,10 @@ public class ChatServer {
         for (PrintWriter writer : printWriters) {
             writer.println(message);
         }
+    }
+
+    public int getPortNumber() {
+        return portNumber;
     }
 
     private static class ClientHandler extends Thread {

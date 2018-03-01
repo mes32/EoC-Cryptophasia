@@ -23,7 +23,19 @@ public class ChatClient {
     private JTextField textField = new JTextField(40);
 
     ChatClient() {
-        Socket socket = connectWithServer();
+        System.out.println();
+        String serverAddress = serverAddressPrompt();
+        int serverPortNumber = serverPortNumberPrompt();
+        System.out.println();
+        startGUI(serverAddress, serverPortNumber);
+    }
+
+    ChatClient(String serverAddress, int serverPortNumber) {
+        startGUI(serverAddress, serverPortNumber);
+    }
+
+    private void startGUI(String serverAddress, int serverPortNumber) {
+        Socket socket = connectWithServer(serverAddress, serverPortNumber);
         BufferedReader inputStream = setupInputStream(socket);
         PrintWriter outputStream = setupOutputStream(socket);
 
@@ -81,12 +93,7 @@ public class ChatClient {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private Socket connectWithServer() {
-        System.out.println();
-        String serverAddress = serverAddressPrompt();
-        int serverPortNumber = serverPortNumberPrompt();
-        System.out.println();
-
+    private Socket connectWithServer(String serverAddress, int serverPortNumber) {
         Socket socket = null;
         try {
             socket = new Socket(serverAddress, serverPortNumber);
