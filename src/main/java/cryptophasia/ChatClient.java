@@ -13,13 +13,15 @@ import java.net.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.text.*;
+import javax.swing.text.html.*;
 
 public class ChatClient {
 
     private String userName;
 
     private JFrame frame = new JFrame("Chat Client");
-    private JTextArea messageDisplay = new JTextArea(14, 40);
+    private JTextPane messageDisplay = new JTextPane();
+    private JScrollPane messageScroll = new JScrollPane(messageDisplay);
     private JTextField textField = new JTextField(40);
     private ChatAudioIndicator soundIndicator = new ChatAudioIndicator();
 
@@ -40,10 +42,15 @@ public class ChatClient {
         BufferedReader inputStream = setupInputStream(socket);
         PrintWriter outputStream = setupOutputStream(socket);
 
+        configMessageScroll();
         configMessageDisplay();
         configTextField(outputStream);
         configFrame();
         frame.setVisible(true);
+
+        HTMLDocument html = (HTMLDocument) messageDisplay.getDocument();
+        Element bodyElement = html.getElement("body");
+        String junk = "<body style=\"font-family: sans-serif; font-size: 12px\">";
 
         String message;
         try {
@@ -62,18 +69,47 @@ public class ChatClient {
             while (true) {
                 message = inputStream.readLine();
                 soundIndicator.play();
-                messageDisplay.append(message + "\n");
-                messageDisplay.setCaretPosition(messageDisplay.getDocument().getLength());
+                html.insertBeforeEnd(bodyElement, "<p>" + message + "</p>");
+
+                junk += messageToHTML(message);
+
+                HTMLEditorKit kit = new HTMLEditorKit(); 
+                StringWriter writer = new StringWriter();
+                kit.write(writer, html, 0, html.getLength());
+                String s = writer.toString();
+
+                messageDisplay.setText(junk);
             }
-        } catch (IOException e) {
+        } catch (IOException | BadLocationException e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
 
+    private String messageToHTML(String message) {
+
+
+        int i = message.indexOf(':');
+        if (i == -1) {
+            return "<font color=C0C0C0>" + message + "</font><br>";
+        }
+        String name = message.substring(0, i);
+        String body = message.substring(i+2);
+
+        if (name.equals(userName)) {
+            return "<b><font color=11609C>&nbsp;&nbsp;" + name + ":</font></b> <font color=083251>" + body + "</font><br>";
+        } else {
+            return "<b><font color=45CE83>&nbsp;&nbsp;" + name + ":</font></b> " + body + "<br>";
+        }      }
+
+    private void configMessageScroll() {
+        messageScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        messageScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    }
+
     private void configMessageDisplay() {
+        messageDisplay.setContentType("text/html");
         messageDisplay.setEditable(false);
-        messageDisplay.setLineWrap(true);
     }
 
     private void configTextField(PrintWriter out) {
@@ -87,10 +123,10 @@ public class ChatClient {
     }
 
     private void configFrame() {
-        JScrollPane scrollPane = new JScrollPane(messageDisplay, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        frame.getContentPane().add(scrollPane, "North");
-        frame.getContentPane().add(textField, "South");
-        frame.pack();
+        frame.setSize(400, 500);
+        frame.setLayout(new BorderLayout());
+        frame.getContentPane().add(messageScroll, BorderLayout.CENTER);
+        frame.getContentPane().add(textField, BorderLayout.SOUTH);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
