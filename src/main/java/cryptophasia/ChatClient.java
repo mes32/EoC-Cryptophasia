@@ -35,17 +35,17 @@ public class ChatClient {
 
     ChatClient() {
         System.out.println();
-        String serverAddress = serverAddressPrompt();
+        InetAddress serverAddress = serverAddressPrompt();
         int serverPortNumber = serverPortNumberPrompt();
         System.out.println();
         startGUI(serverAddress, serverPortNumber);
     }
 
-    ChatClient(String serverAddress, int serverPortNumber) {
+    ChatClient(InetAddress serverAddress, int serverPortNumber) {
         startGUI(serverAddress, serverPortNumber);
     }
 
-    private void startGUI(String serverAddress, int serverPortNumber) {
+    private void startGUI(InetAddress serverAddress, int serverPortNumber) {
         Socket socket = connectWithServer(serverAddress, serverPortNumber);
         BufferedReader inputStream = setupInputStream(socket);
         PrintWriter outputStream = setupOutputStream(socket);
@@ -149,7 +149,7 @@ public class ChatClient {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private Socket connectWithServer(String serverAddress, int serverPortNumber) {
+    private Socket connectWithServer(InetAddress serverAddress, int serverPortNumber) {
         Socket socket = null;
         try {
             socket = new Socket(serverAddress, serverPortNumber);
@@ -185,11 +185,31 @@ public class ChatClient {
         return outputStream;
     }
 
-    private String serverAddressPrompt() {
+    private InetAddress serverAddressPrompt() {
         Scanner scan = new Scanner(System.in);
         System.out.print("Server IP: ");
-        String serverAddress = scan.next();
+        String addressString = scan.next();
+        byte[] address = stringToAddress(addressString);
+
+        InetAddress serverAddress = null;
+        try {
+            serverAddress = InetAddress.getByAddress(address);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            System.err.println("ERROR: Unusable server IP address.");
+            System.exit(1);
+        }
         return serverAddress;
+    }
+
+    private byte[] stringToAddress(String string) {
+        String[] digits = string.split("\\.");
+        byte[] address = new byte[digits.length];
+        for (int i = 0; i < digits.length; i++) {
+            Integer current = new Integer(digits[i]);
+            address[i] = current.byteValue();
+        }
+        return address;
     }
 
     private int serverPortNumberPrompt() {

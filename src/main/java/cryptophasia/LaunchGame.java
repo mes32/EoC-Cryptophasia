@@ -7,6 +7,7 @@
 package cryptophasia;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 
 public class LaunchGame {
@@ -54,7 +55,7 @@ public class LaunchGame {
     private static void startSelected(int choice) {
         if (choice == SELECT_SERVER) {
             ChatServer server = new ChatServer();
-            String serverAddress = "127.0.0.1";
+            InetAddress loopBack = InetAddress.getLoopbackAddress();
             int serverPortNumber = server.getPortNumber();
 
             Runnable r = new Runnable() {
@@ -64,7 +65,7 @@ public class LaunchGame {
             };
             new Thread(r).start();
 
-            new ChatClient(serverAddress, serverPortNumber);
+            new ChatClient(loopBack, serverPortNumber);
         } else if (choice == SELECT_CLIENT) {
             new ChatClient();
         }
