@@ -1,7 +1,7 @@
 /*
     ChatClientGUI.java
 
-    Client that sends messages to the ChatServer
+    GUI interface for ChatClient
  */
 
 package cryptophasia;
@@ -23,16 +23,12 @@ public class ChatClientGUI {
     private String userName;
     private JFrame frame = new JFrame("Chat Client");
 
-    //private HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
-    //private HTMLDocument document = new HTMLDocument();
+    private ChatDocument document = new ChatDocument();
     private JTextPane messageDisplay = new JTextPane();
     private JScrollPane messageScroll = new JScrollPane(messageDisplay);
     private JScrollBar vertical = messageScroll.getVerticalScrollBar();
     private JTextField textField = new JTextField(40);
     private ChatAudioIndicator soundIndicator = new ChatAudioIndicator();
-    private StringBuilder stringBuilder;
-
-    private int length = 0;
 
     ChatClientGUI(BufferedReader inputStream, PrintWriter outputStream) {
         this.inputStream = inputStream;
@@ -43,18 +39,6 @@ public class ChatClientGUI {
         configTextField(outputStream);
         configFrame();
         frame.setVisible(true);
-
-        // Element[] roots = document.getRootElements();
-        // Element body = null;
-        // for(int i = 0; i < roots[0].getElementCount(); i++ ) {
-        //     Element element = roots[0].getElement(i);
-        //     if( element.getAttributes().getAttribute(StyleConstants.NameAttribute) == HTML.Tag.BODY) {
-        //         body = element;
-        //         break;
-        //     }
-        // }
-
-        stringBuilder = new StringBuilder("<body style=\"font-family: sans-serif; font-size: 12px\">");
 
         String message;
         try {
@@ -68,12 +52,15 @@ public class ChatClientGUI {
             }
             textField.setEditable(true);
             frame.setTitle("Chat Client - " + userName);
+            document.setUserName(userName);
 
             while (true) {
                 message = inputStream.readLine();
                 soundIndicator.play();
-                messageToHTML(message, stringBuilder);
-                messageDisplay.setText(stringBuilder.toString());
+                document.append(message);
+
+                // TODO: document should be self updating and not require setText()
+                messageDisplay.setText(document.toString());
 
                 // TODO: The following line isn't 100% reliable
                 messageScroll.getViewport().setViewPosition(new Point(0, messageDisplay.getDocument().getLength()));
@@ -84,32 +71,13 @@ public class ChatClientGUI {
         }
     }
 
-    private void messageToHTML(String message, StringBuilder stringBuilder) {
-
-        length++;
-
-        int i = message.indexOf(':');
-        if (i == -1) {
-            stringBuilder.append("<font color=C0C0C0>" + message + "</font><br>");
-        } else {
-            String name = message.substring(0, i);
-            String body = message.substring(i+2);
-
-            if (name.equals(userName)) {
-                stringBuilder.append("<b><font color=11609C>&nbsp;&nbsp;" + name + ":</font></b> <font color=083251>" + body + "</font><br>");
-            } else {
-                stringBuilder.append("<b><font color=45CE83>&nbsp;&nbsp;" + name + ":</font></b> " + body + "<br>");
-            }
-        }
-    }
-
     private void configMessageScroll() {
         messageScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         messageScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     }
 
     private void configMessageDisplay() {
-        messageDisplay.setContentType("text/html");
+        messageDisplay.setContentType(document.getDocumentType());
         messageDisplay.setEditable(false);
     }
 
