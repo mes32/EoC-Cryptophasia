@@ -20,10 +20,18 @@ public class ChatClient {
     private String userName;
 
     private JFrame frame = new JFrame("Chat Client");
+
+
+    //private HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
+    //private HTMLDocument document = new HTMLDocument();
     private JTextPane messageDisplay = new JTextPane();
     private JScrollPane messageScroll = new JScrollPane(messageDisplay);
+    private JScrollBar vertical = messageScroll.getVerticalScrollBar();
     private JTextField textField = new JTextField(40);
     private ChatAudioIndicator soundIndicator = new ChatAudioIndicator();
+    private StringBuilder stringBuilder;
+
+    private int length = 0;
 
     ChatClient() {
         System.out.println();
@@ -48,9 +56,17 @@ public class ChatClient {
         configFrame();
         frame.setVisible(true);
 
-        HTMLDocument html = (HTMLDocument) messageDisplay.getDocument();
-        Element bodyElement = html.getElement("body");
-        String junk = "<body style=\"font-family: sans-serif; font-size: 12px\">";
+        // Element[] roots = document.getRootElements();
+        // Element body = null;
+        // for(int i = 0; i < roots[0].getElementCount(); i++ ) {
+        //     Element element = roots[0].getElement(i);
+        //     if( element.getAttributes().getAttribute(StyleConstants.NameAttribute) == HTML.Tag.BODY) {
+        //         body = element;
+        //         break;
+        //     }
+        // }
+
+        stringBuilder = new StringBuilder("<body style=\"font-family: sans-serif; font-size: 12px\">");
 
         String message;
         try {
@@ -69,38 +85,39 @@ public class ChatClient {
             while (true) {
                 message = inputStream.readLine();
                 soundIndicator.play();
-                html.insertBeforeEnd(bodyElement, "<p>" + message + "</p>");
+                //document.insertBeforeEnd(body, message + "<br>");
 
-                junk += messageToHTML(message);
+                messageToHTML(message, stringBuilder);
 
-                HTMLEditorKit kit = new HTMLEditorKit(); 
-                StringWriter writer = new StringWriter();
-                kit.write(writer, html, 0, html.getLength());
-                String s = writer.toString();
+                messageDisplay.setText(stringBuilder.toString());
 
-                messageDisplay.setText(junk);
+                // TODO: The following line isn't 100% reliable
+                messageScroll.getViewport().setViewPosition(new Point(0, messageDisplay.getDocument().getLength()));
             }
-        } catch (IOException | BadLocationException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-    private String messageToHTML(String message) {
+    private void messageToHTML(String message, StringBuilder stringBuilder) {
 
+        length++;
 
         int i = message.indexOf(':');
         if (i == -1) {
-            return "<font color=C0C0C0>" + message + "</font><br>";
-        }
-        String name = message.substring(0, i);
-        String body = message.substring(i+2);
-
-        if (name.equals(userName)) {
-            return "<b><font color=11609C>&nbsp;&nbsp;" + name + ":</font></b> <font color=083251>" + body + "</font><br>";
+            stringBuilder.append("<font color=C0C0C0>" + message + "</font><br>");
         } else {
-            return "<b><font color=45CE83>&nbsp;&nbsp;" + name + ":</font></b> " + body + "<br>";
-        }      }
+            String name = message.substring(0, i);
+            String body = message.substring(i+2);
+
+            if (name.equals(userName)) {
+                stringBuilder.append("<b><font color=11609C>&nbsp;&nbsp;" + name + ":</font></b> <font color=083251>" + body + "</font><br>");
+            } else {
+                stringBuilder.append("<b><font color=45CE83>&nbsp;&nbsp;" + name + ":</font></b> " + body + "<br>");
+            }
+        }
+    }
 
     private void configMessageScroll() {
         messageScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -110,6 +127,7 @@ public class ChatClient {
     private void configMessageDisplay() {
         messageDisplay.setContentType("text/html");
         messageDisplay.setEditable(false);
+        //htmlEditorKit.install(messageDisplay);
     }
 
     private void configTextField(PrintWriter out) {
