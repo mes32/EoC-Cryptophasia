@@ -14,7 +14,6 @@ import javax.swing.*;
 
 public class LaunchGame {
     private static final int SELECT_SERVER = 1;
-    //private static final int SELECT_MONITOR = 2;
     private static final int SELECT_CLIENT = 2;
 
     public static void main(String[] args) {
@@ -66,12 +65,6 @@ public class LaunchGame {
                 }
             };
             new Thread(r).start();
-
-            // SwingUtilities.invokeLater(new Runnable() {
-            //         public void run() {
-            //             new ChatClient(loopBack, serverPortNumber);
-            //         }
-            //     });
 
             new ChatClient(loopBack, serverPortNumber);
         } else if (choice == SELECT_CLIENT) {

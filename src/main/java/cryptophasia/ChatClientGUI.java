@@ -23,7 +23,6 @@ public class ChatClientGUI {
     private String userName;
     private JFrame frame = new JFrame("Chat Client");
 
-    //private ChatDocument document = new ChatDocument();
     private JTextPane messageDisplay = new JTextPane();
     private JScrollPane messageScroll = new JScrollPane(messageDisplay);
     private JScrollBar vertical = messageScroll.getVerticalScrollBar();
@@ -52,23 +51,11 @@ public class ChatClientGUI {
             }
             textField.setEditable(true);
             frame.setTitle("Chat Client - " + userName);
-            //document.setUserName(userName);
 
             while (true) {
                 message = inputStream.readLine();
                 soundIndicator.play();
-                //document.append(message);
-
-                // TODO: document should be self updating and not require setText()
-                //messageDisplay.setText(document.toString());
-
-                // TODO: The following line isn't 100% reliable
-                //messageScroll.getViewport().setViewPosition(new Point(0, messageDisplay.getDocument().getLength()));
-
-                appendToPane(messageDisplay, message + "\n", Color.BLUE);
-
-                //messageScroll.getViewport().setViewPosition(new Point(0, messageDisplay.getDocument().getLength()));
-
+                appendMessage(message);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,22 +63,58 @@ public class ChatClientGUI {
         }
     }
 
-    private void appendToPane(JTextPane tp, String msg, Color c) {
-        StyleContext sc = StyleContext.getDefaultStyleContext();
-        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
+    private void appendMessage(String message) {
+        Color black = Color.BLACK;
+        Color gray = new Color(192, 192, 192);
+        Color blue = new Color(17, 96, 156);
+        Color green = new Color(69, 206, 131);
 
-        aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
-        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+        if (message.startsWith(" + ")) {
+            // Message is from the server
 
-        tp.setEditable(true);
-        int len = tp.getDocument().getLength();
-        tp.setCaretPosition(len);
-        tp.setCharacterAttributes(aset, false);
-        tp.replaceSelection(msg);
+            putText(message + "\n", false, gray);
+        } else if (message.startsWith(userName)) {
+            // Message is from local user
 
-        len = tp.getDocument().getLength();
-        tp.setCaretPosition(len);
-        tp.setEditable(false);
+            String[] tokens = message.split("\\:", 2);
+            String name = tokens[0];
+            String body = tokens[1];
+
+            putText(" " + name + ": ", true, blue);
+            putText(body + "\n", false, black);
+        } else {
+            // Message is from another user
+
+            String[] tokens = message.split("\\:", 2);
+            String name = tokens[0];
+            String body = tokens[1];
+
+            putText(" " + name + ": ", true, green);
+            putText(body + "\n", false, black);
+        }
+    }
+
+    private void putText(String text, boolean bold, Color color) {
+        StyleContext styleContext = StyleContext.getDefaultStyleContext();
+        AttributeSet attributes = styleContext.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, color);
+        attributes = styleContext.addAttribute(attributes, StyleConstants.FontFamily, "Lucida Console");
+        attributes = styleContext.addAttribute(attributes, StyleConstants.FontSize, 14);
+        attributes = styleContext.addAttribute(attributes, StyleConstants.Bold, bold);
+        attributes = styleContext.addAttribute(attributes, StyleConstants.Alignment, StyleConstants.ALIGN_LEFT);
+        
+        carretToEnd();
+        messageDisplay.setEditable(true);
+
+        messageDisplay.setCharacterAttributes(attributes, false);
+        messageDisplay.replaceSelection(text);
+
+        messageDisplay.setEditable(false);
+        carretToEnd();
+    }
+
+    private void carretToEnd() {
+        int len = messageDisplay.getDocument().getLength();
+        messageDisplay.setCaretPosition(len);
     }
 
     private void configMessageScroll() {
