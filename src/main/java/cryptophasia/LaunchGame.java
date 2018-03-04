@@ -9,6 +9,8 @@ package cryptophasia;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import javax.swing.*;
+
 
 public class LaunchGame {
     private static final int SELECT_SERVER = 1;
@@ -64,6 +66,12 @@ public class LaunchGame {
                 }
             };
             new Thread(r).start();
+
+            // SwingUtilities.invokeLater(new Runnable() {
+            //         public void run() {
+            //             new ChatClient(loopBack, serverPortNumber);
+            //         }
+            //     });
 
             new ChatClient(loopBack, serverPortNumber);
         } else if (choice == SELECT_CLIENT) {

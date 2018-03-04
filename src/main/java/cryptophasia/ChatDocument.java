@@ -6,6 +6,7 @@
 
 package cryptophasia;
 
+import java.io.*;
 import javax.swing.text.*;
 import javax.swing.text.html.*;
 
@@ -29,8 +30,13 @@ public class ChatDocument extends HTMLDocument {
     private StringBuilder stringBuilder;
     private int length = 0;
 
+    private Element root;
+
     ChatDocument() {
+        super();
         stringBuilder = new StringBuilder(BODY_STYLE);
+
+        root = createDefaultRoot();
     }
 
     public String getDocumentType() {
@@ -43,6 +49,13 @@ public class ChatDocument extends HTMLDocument {
 
     public void append(String message) {
         stringBuilder.append(messageToHTML(message));
+
+        /*try {
+            insertBeforeEnd(root, "<p>Test</p>");
+        } catch (BadLocationException | IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }*/
     }
 
     public String toString() {

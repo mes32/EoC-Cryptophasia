@@ -23,7 +23,7 @@ public class ChatClientGUI {
     private String userName;
     private JFrame frame = new JFrame("Chat Client");
 
-    private ChatDocument document = new ChatDocument();
+    //private ChatDocument document = new ChatDocument();
     private JTextPane messageDisplay = new JTextPane();
     private JScrollPane messageScroll = new JScrollPane(messageDisplay);
     private JScrollBar vertical = messageScroll.getVerticalScrollBar();
@@ -52,23 +52,46 @@ public class ChatClientGUI {
             }
             textField.setEditable(true);
             frame.setTitle("Chat Client - " + userName);
-            document.setUserName(userName);
+            //document.setUserName(userName);
 
             while (true) {
                 message = inputStream.readLine();
                 soundIndicator.play();
-                document.append(message);
+                //document.append(message);
 
                 // TODO: document should be self updating and not require setText()
-                messageDisplay.setText(document.toString());
+                //messageDisplay.setText(document.toString());
 
                 // TODO: The following line isn't 100% reliable
-                messageScroll.getViewport().setViewPosition(new Point(0, messageDisplay.getDocument().getLength()));
+                //messageScroll.getViewport().setViewPosition(new Point(0, messageDisplay.getDocument().getLength()));
+
+                appendToPane(messageDisplay, message + "\n", Color.BLUE);
+
+                //messageScroll.getViewport().setViewPosition(new Point(0, messageDisplay.getDocument().getLength()));
+
             }
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private void appendToPane(JTextPane tp, String msg, Color c) {
+        StyleContext sc = StyleContext.getDefaultStyleContext();
+        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
+
+        aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
+        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+
+        tp.setEditable(true);
+        int len = tp.getDocument().getLength();
+        tp.setCaretPosition(len);
+        tp.setCharacterAttributes(aset, false);
+        tp.replaceSelection(msg);
+
+        len = tp.getDocument().getLength();
+        tp.setCaretPosition(len);
+        tp.setEditable(false);
     }
 
     private void configMessageScroll() {
@@ -77,7 +100,7 @@ public class ChatClientGUI {
     }
 
     private void configMessageDisplay() {
-        messageDisplay.setContentType(document.getDocumentType());
+        //messageDisplay.setContentType(document.getDocumentType());
         messageDisplay.setEditable(false);
     }
 
