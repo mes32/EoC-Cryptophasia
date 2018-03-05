@@ -51,15 +51,25 @@ public class ChatClientGUI {
             }
             textField.setEditable(true);
             frame.setTitle("Chat Client - " + userName);
-
-            while (true) {
-                message = inputStream.readLine();
-                soundIndicator.play();
-                appendMessage(message);
-            }
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
+        }
+
+        while (true) {
+            try {
+                message = inputStream.readLine();
+                if (message == null) {
+                    appendMessage(" + Server is down");
+                    textField.setEditable(false);
+                    break;
+                }
+                soundIndicator.play();
+                appendMessage(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+                appendMessage("IOException - received unreadable message from server");
+            }
         }
     }
 
@@ -69,10 +79,18 @@ public class ChatClientGUI {
         Color blue = new Color(17, 96, 156);
         Color green = new Color(69, 206, 131);
 
-        if (message.startsWith(" + ")) {
+        if (message == null) {
+            return;
+        } else if (message.equals(ChatServer.SHUTDOWN)) {
+            System.exit(1);
+        } else if (message.startsWith(" + ")) {
             // Message is from the server
 
             putText(message + "\n", false, gray);
+        } else if (message.indexOf(":") == -1) {
+            // Message is of type error or unknown
+
+            putText(message + "\n", true, black);
         } else if (message.startsWith(userName)) {
             // Message is from local user
 
@@ -91,7 +109,7 @@ public class ChatClientGUI {
 
             putText(" " + name + ": ", true, green);
             putText(body + "\n", false, black);
-        }
+        }   
     }
 
     private void putText(String text, boolean bold, Color color) {

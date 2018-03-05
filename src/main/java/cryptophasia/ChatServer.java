@@ -13,6 +13,7 @@ import java.util.*;
 public class ChatServer {
     public static final String SUBMITNAME = "SUBMITNAME";
     public static final String NAMEACCEPT = "NAMEACCEPT";
+    public static final String SHUTDOWN = "SHUTDOWN";
 
     private int userCount = 0;
     private ArrayList<PrintWriter> printWriters = new ArrayList<PrintWriter>();
@@ -47,8 +48,12 @@ public class ChatServer {
         }
     }
 
-    public void addWriter(PrintWriter writer) {
+    protected void addWriter(PrintWriter writer) {
         printWriters.add(writer);
+    }
+
+    protected void removeWriter(PrintWriter writer) {
+        printWriters.remove(writer);
     }
 
     private String getInternalAddress() {
@@ -146,6 +151,8 @@ public class ChatServer {
                         message = in.readLine();
                         if (message == null || message.equals(".")) {
                             server.display(" + " + userName + " left chat server");
+                            server.removeWriter(out);
+                            out.println(SHUTDOWN);
                             break;
                         }
                         server.display(userName + ": " + message);
