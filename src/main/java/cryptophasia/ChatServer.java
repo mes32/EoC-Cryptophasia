@@ -32,7 +32,8 @@ public class ChatServer extends Thread {
             while (true) {
                 try {
                     Socket socket = listener.accept();
-                    display(" + Socket connection accepted");
+                    ServerNotificationMessage connectionAcception = new ServerNotificationMessage("Socket connection accepted");
+                    display(connectionAcception);
                     new ChatClientHandler(socket, this).start();
                 } catch (IOException e) {
                     display(" + Socket connection refused");
@@ -52,6 +53,13 @@ public class ChatServer extends Thread {
         System.out.println(message);
         for (PrintWriter writer : printWriters) {
             writer.println(message);
+        }
+    }
+
+    public void display(AbstractMessage message) {
+        System.out.println(message.toString());
+        for (PrintWriter writer : printWriters) {
+            writer.println(message.transmit());
         }
     }
 

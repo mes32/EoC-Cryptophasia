@@ -56,13 +56,17 @@ public class ChatClientGUI {
         while (true) {
             try {
                 message = inputStream.readLine();
+                AbstractMessage message2 = AbstractMessage.parse(message);
                 if (message == null) {
                     appendMessage(" + Server is down");
                     textField.setEditable(false);
                     break;
                 }
+                if (message2 == null) {
+                    appendMessage(message);
+                }
                 soundIndicator.play();
-                appendMessage(message);
+                appendMessage(message2);
             } catch (IOException e) {
                 e.printStackTrace();
                 appendMessage("IOException - received unreadable message from server");
@@ -71,6 +75,10 @@ public class ChatClientGUI {
     }
 
     private void appendMessage(String message) {
+        messagePane.appendMessage(message);
+    }
+
+    private void appendMessage(AbstractMessage message) {
         messagePane.appendMessage(message);
     }
 

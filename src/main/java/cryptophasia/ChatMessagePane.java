@@ -74,6 +74,14 @@ public class ChatMessagePane extends JScrollPane {
         }
     }
 
+    public void appendMessage(AbstractMessage message) {
+
+    }
+
+    public void appendMessage(ServerNotificationMessage message) {
+        putText(" + + " + message.getBody() + "\n", SERVER_NOTE_STYLE);
+    }
+
     private void putText(String text, AttributeSet attributes) {        
         carretToBottom();
         messageDisplay.setEditable(true);
