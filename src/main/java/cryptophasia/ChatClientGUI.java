@@ -23,9 +23,7 @@ public class ChatClientGUI {
     private String userName;
     private JFrame frame = new JFrame("Chat Client");
 
-    private JTextPane messageDisplay = new JTextPane();
-    private JScrollPane messageScroll = new JScrollPane(messageDisplay);
-    private JScrollBar vertical = messageScroll.getVerticalScrollBar();
+    private ChatMessagePane messagePane = new ChatMessagePane();
     private JTextField textField = new JTextField(40);
     private ChatAudioIndicator soundIndicator = new ChatAudioIndicator();
 
@@ -33,8 +31,6 @@ public class ChatClientGUI {
         this.inputStream = inputStream;
         this.outputStream = outputStream;
 
-        configMessageScroll();
-        configMessageDisplay();
         configTextField(outputStream);
         configFrame();
         frame.setVisible(true);
@@ -45,6 +41,7 @@ public class ChatClientGUI {
             if (message.equals(ChatServer.SUBMITNAME)) {
                 do {
                     userName = userNameDialog();
+                    messagePane.setUserName(userName);
                     outputStream.println(userName);
                     message = inputStream.readLine();
                 } while(!message.equals(ChatServer.NAMEACCEPT));
@@ -74,75 +71,7 @@ public class ChatClientGUI {
     }
 
     private void appendMessage(String message) {
-        Color black = Color.BLACK;
-        Color gray = new Color(192, 192, 192);
-        Color blue = new Color(17, 96, 156);
-        Color green = new Color(69, 206, 131);
-
-        if (message == null) {
-            return;
-        } else if (message.equals(ChatServer.SHUTDOWN)) {
-            System.exit(1);
-        } else if (message.startsWith(" + ")) {
-            // Message is from the server
-
-            putText(message + "\n", false, gray);
-        } else if (message.indexOf(":") == -1) {
-            // Message is of type error or unknown
-
-            putText(message + "\n", true, black);
-        } else if (message.startsWith(userName)) {
-            // Message is from local user
-
-            String[] tokens = message.split("\\:", 2);
-            String name = tokens[0];
-            String body = tokens[1];
-
-            putText(" " + name + ": ", true, blue);
-            putText(body + "\n", false, black);
-        } else {
-            // Message is from another user
-
-            String[] tokens = message.split("\\:", 2);
-            String name = tokens[0];
-            String body = tokens[1];
-
-            putText(" " + name + ": ", true, green);
-            putText(body + "\n", false, black);
-        }   
-    }
-
-    private void putText(String text, boolean bold, Color color) {
-        StyleContext styleContext = StyleContext.getDefaultStyleContext();
-        AttributeSet attributes = styleContext.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, color);
-        attributes = styleContext.addAttribute(attributes, StyleConstants.FontFamily, "Lucida Console");
-        attributes = styleContext.addAttribute(attributes, StyleConstants.FontSize, 14);
-        attributes = styleContext.addAttribute(attributes, StyleConstants.Bold, bold);
-        attributes = styleContext.addAttribute(attributes, StyleConstants.Alignment, StyleConstants.ALIGN_LEFT);
-        
-        carretToEnd();
-        messageDisplay.setEditable(true);
-
-        messageDisplay.setCharacterAttributes(attributes, false);
-        messageDisplay.replaceSelection(text);
-
-        messageDisplay.setEditable(false);
-        carretToEnd();
-    }
-
-    private void carretToEnd() {
-        int len = messageDisplay.getDocument().getLength();
-        messageDisplay.setCaretPosition(len);
-    }
-
-    private void configMessageScroll() {
-        messageScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        messageScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    }
-
-    private void configMessageDisplay() {
-        //messageDisplay.setContentType(document.getDocumentType());
-        messageDisplay.setEditable(false);
+        messagePane.appendMessage(message);
     }
 
     private void configTextField(PrintWriter out) {
@@ -158,7 +87,7 @@ public class ChatClientGUI {
     private void configFrame() {
         frame.setSize(400, 500);
         frame.setLayout(new BorderLayout());
-        frame.getContentPane().add(messageScroll, BorderLayout.CENTER);
+        frame.getContentPane().add(messagePane, BorderLayout.CENTER);
         frame.getContentPane().add(textField, BorderLayout.SOUTH);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
