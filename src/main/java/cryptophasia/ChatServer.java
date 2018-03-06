@@ -1,7 +1,7 @@
 /*
     ChatServer.java
 
-    A terminal-based multi-user instant messaging server
+    Instant messaging server
  */
 
 package cryptophasia;
@@ -33,7 +33,7 @@ public class ChatServer {
                 try {
                     Socket socket = listener.accept();
                     display(" + Socket connection accepted");
-                    new ClientHandler(socket, this).start();
+                    new ChatClientHandler(socket, this).start();
                 } catch (IOException e) {
                     display(" + Socket connection refused");
                 }
@@ -48,11 +48,11 @@ public class ChatServer {
         }
     }
 
-    protected void addWriter(PrintWriter writer) {
+    public void addWriter(PrintWriter writer) {
         printWriters.add(writer);
     }
 
-    protected void removeWriter(PrintWriter writer) {
+    public void removeWriter(PrintWriter writer) {
         printWriters.remove(writer);
     }
 
@@ -108,7 +108,7 @@ public class ChatServer {
         return listener;
     }
 
-    private void display(String message) {
+    public void display(String message) {
         System.out.println(message);
         for (PrintWriter writer : printWriters) {
             writer.println(message);
@@ -118,51 +118,4 @@ public class ChatServer {
     public int getPortNumber() {
         return portNumber;
     }
-
-    private static class ClientHandler extends Thread {
-        private Socket socket;
-        private ChatServer server;
-        private BufferedReader in;
-        private PrintWriter out;
-
-        private String userName;
-        private int number;
-
-        public ClientHandler(Socket socket, ChatServer server) {
-            this.socket = socket;
-            this.server = server;
-        }
-
-        public void run() {
-            try {
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                out = new PrintWriter(socket.getOutputStream(), true);
-
-                server.display(" + New CLIENT added");
-                out.println(ChatServer.SUBMITNAME);
-                userName = in.readLine();
-                out.println(ChatServer.NAMEACCEPT);
-                server.addWriter(out);
-                server.display(" + " + userName + " joined chat server");
-
-                String message;
-                while (true) {
-                    try {
-                        message = in.readLine();
-                        if (message == null || message.equals(".")) {
-                            server.display(" + " + userName + " left chat server");
-                            server.removeWriter(out);
-                            out.println(SHUTDOWN);
-                            break;
-                        }
-                        server.display(userName + ": " + message);
-                    } catch (IOException e) {
-                        server.display(" + ERROR: IOException reading from " + userName + ".");
-                    }
-                }
-            } catch (IOException e) {
-
-            }
-        }
-    }           
 }
