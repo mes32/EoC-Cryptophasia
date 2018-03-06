@@ -48,38 +48,26 @@ public class ChatMessagePane extends JScrollPane {
             return;
         } else if (message.equals(ChatServer.SHUTDOWN)) {
             System.exit(1);
-        } else if (message.startsWith(" + ")) {
-            // Message is from the server
-
-            putText(message + "\n", SERVER_NOTE_STYLE);
-        } else if (message.indexOf(":") == -1) {
-            // Message is of type error or unknown
+        } else {
+            // Message is of unknown type
 
             putText(message + "\n", DEFAULT_STYLE);
-        } else {
-            String[] tokens = message.split("\\:", 2);
-            String name = tokens[0];
-            String body = tokens[1];
-            if (message.startsWith(userName)) {
-                // Message is from local user
-
-                putText(" " + name + ": ", SELF_NAME_STYLE);
-                putText(body + "\n", DEFAULT_STYLE);
-            } else {
-                // Message is from another user
-
-                putText(" " + name + ": ", OTHER_NAME_STYLE);
-                putText(body + "\n", DEFAULT_STYLE);
-            }
         }
     }
 
-    public void appendMessage(AbstractMessage message) {
-
+    public void appendMessage(ServerNotificationMessage message) {
+        putText(" + " + message.getBody() + "\n", SERVER_NOTE_STYLE);
     }
 
-    public void appendMessage(ServerNotificationMessage message) {
-        putText(" + + " + message.getBody() + "\n", SERVER_NOTE_STYLE);
+    public void appendMessage(ChatMessage message) {
+        String name = message.getName();
+        String messageBody = message.getMessage();
+        if (name.equals(userName)) {
+            putText(" " + name + ": ", SELF_NAME_STYLE);
+        } else {
+            putText(" " + name + ": ", OTHER_NAME_STYLE);
+        }
+        putText(messageBody + "\n", DEFAULT_STYLE);
     }
 
     private void putText(String text, AttributeSet attributes) {        

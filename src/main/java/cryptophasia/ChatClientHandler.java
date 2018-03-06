@@ -28,26 +28,26 @@ public class ChatClientHandler extends Thread {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            server.display(" + New CLIENT added");
+            server.display(new ServerNotificationMessage("New CLIENT added"));
             out.println(ChatServer.SUBMITNAME);
             userName = in.readLine();
             out.println(ChatServer.NAMEACCEPT);
             server.addWriter(out);
-            server.display(" + " + userName + " joined chat server");
+            server.display(new ServerNotificationMessage(userName + " joined chat server"));
 
             String message;
             while (true) {
                 try {
                     message = in.readLine();
                     if (message == null || message.equals(".")) {
-                        server.display(" + " + userName + " left chat server");
+                        server.display(new ServerNotificationMessage(userName + " left chat server"));
                         server.removeWriter(out);
                         out.println(ChatServer.SHUTDOWN);
                         break;
                     }
-                    server.display(userName + ": " + message);
+                    server.display(new ChatMessage(userName, message));
                 } catch (IOException e) {
-                    server.display(" + ERROR: IOException reading from " + userName + ".");
+                    server.display(new ServerNotificationMessage("ERROR: IOException reading from " + userName + "."));
                 }
             }
         } catch (IOException e) {

@@ -32,11 +32,11 @@ public class ChatServer extends Thread {
             while (true) {
                 try {
                     Socket socket = listener.accept();
-                    ServerNotificationMessage connectionAcception = new ServerNotificationMessage("Socket connection accepted");
-                    display(connectionAcception);
+                    //ServerNotificationMessage connectionAcception = new ServerNotificationMessage("Socket connection accepted");
+                    display(new ServerNotificationMessage("Socket connection accepted"));
                     new ChatClientHandler(socket, this).start();
                 } catch (IOException e) {
-                    display(" + Socket connection refused");
+                    display(new ServerNotificationMessage("Socket connection refused"));
                 }
             }
         } finally {
@@ -84,7 +84,7 @@ public class ChatServer extends Thread {
             System.err.println("ERROR: ChatServer was unable to open connection.");
             System.exit(1);
         }
-        display(" + Server now listening on port: " + portNumber);
+        display(new ServerNotificationMessage("Server now listening on port: " + portNumber));
         return listener;
     }
 }
