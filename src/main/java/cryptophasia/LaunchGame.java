@@ -55,18 +55,14 @@ public class LaunchGame {
 
     private static void startSelected(int choice) {
         if (choice == SELECT_SERVER) {
-            ChatServer server = new ChatServer();
-            InetAddress loopBack = InetAddress.getLoopbackAddress();
-            int serverPortNumber = server.getPortNumber();
+            ChatServerConfiguration config = new ChatServerConfiguration();
+            InetAddress address = config.getAddress();
+            int port = config.getPortNumber();
 
-            Runnable r = new Runnable() {
-                public void run() {
-                    server.run();
-                }
-            };
-            new Thread(r).start();
+            ChatServer server = new ChatServer(address, port);
+            server.start();
 
-            new ChatClient(loopBack, serverPortNumber);
+            new ChatClient(address, port);
         } else if (choice == SELECT_CLIENT) {
             new ChatClient();
         }
