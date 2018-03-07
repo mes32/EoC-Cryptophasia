@@ -37,19 +37,20 @@ public class ChatClientGUI {
 
         String line;
         try {
-            //boolean accepted = false;
-            //do {
+            boolean accepted = false;
+            do {
                 userName = userNameDialog();
                 SubmitUsernameMessage submitMessage = new SubmitUsernameMessage(userName);
                 outputStream.println(submitMessage.transmit());
 
                 line = inputStream.readLine();
-                if (!line.equals(ChatServer.NAMEACCEPT)) {
+                AcceptUsernameMessage acceptMessage = AcceptUsernameMessage.parse(line);
+                accepted = acceptMessage.isAccepted();
+                if (!accepted) {
                     appendMessage(new ServerNotificationMessage("Username '" + userName + "' was rejected by the server"));
-                    System.err.println("ERROR: Username was not accepted");
-                    System.exit(1);
+                    appendMessage(new ServerNotificationMessage("Trying again"));
                 }
-            //} while(!accepted);
+            } while(!accepted);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);

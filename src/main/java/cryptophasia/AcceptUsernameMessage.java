@@ -10,17 +10,23 @@ package cryptophasia;
 public class AcceptUsernameMessage extends AbstractMessage {
 
     private static final String HEADER = AbstractMessage.ACCEPT_USERNAME;
+    private static final String TRUE = "true";
+    private static final String FALSE = "false";
 
-    private String username;
+    private boolean accepted;
 
-    AcceptUsernameMessage(String username) {
-        this.username = username;
+    AcceptUsernameMessage(boolean accepted) {
+        this.accepted = accepted;
     }
 
     public static AcceptUsernameMessage parse(String transmission) {
         int index = HEADER.length();
-        String username = transmission.substring(index);
-        return new AcceptUsernameMessage(username);
+        String accepted = transmission.substring(index);
+        if (accepted.equals(TRUE)) {
+            return new AcceptUsernameMessage(true);
+        } else {
+            return new AcceptUsernameMessage(false);
+        }
     }
 
     public static boolean indicated(String transmission) {
@@ -31,11 +37,19 @@ public class AcceptUsernameMessage extends AbstractMessage {
         }
     }
 
+    public boolean isAccepted() {
+        return accepted;
+    }
+
     public String transmit() {
-        return HEADER + username;
+        if (accepted) {
+            return HEADER + TRUE;
+        } else {
+            return HEADER + FALSE;
+        }
     }
 
     public String toString() {
-        return HEADER + username;
+        return transmit();
     }
 }

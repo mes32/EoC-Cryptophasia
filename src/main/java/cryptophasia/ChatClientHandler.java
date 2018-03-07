@@ -24,7 +24,7 @@ public class ChatClientHandler extends Thread {
 
     public void run() {
         server.display(new ServerNotificationMessage("New CLIENT found"));
-        
+
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
@@ -34,22 +34,24 @@ public class ChatClientHandler extends Thread {
             return;
         }
 
-        try {
-            String transmission = in.readLine();
-            if (SubmitUsernameMessage.indicated(transmission)) {
+        boolean accepted = false;
+        do {
+            try {
+                String transmission = in.readLine();
                 SubmitUsernameMessage submission = SubmitUsernameMessage.parse(transmission);
                 userName = submission.getUsername();
+
+                accepted = true;
+
+                AcceptUsernameMessage acceptance = new AcceptUsernameMessage(accepted);
+                out.println(acceptance.transmit());
+            } catch (IOException e) {
+                server.display(new ServerNotificationMessage("WARNING: IOException in ChatClientHandler username loop"));
             }
+        } while (!accepted);
 
-            out.println(ChatServer.NAMEACCEPT);
-            server.addWriter(out);
-            server.display(new ServerNotificationMessage(userName + " joined chat server"));
-
-        } catch (IOException e) {
-            server.display(new ServerNotificationMessage("WARNING: New CLIENT was refused"));
-            server.display(new ServerNotificationMessage("In ChatClientHandler username setup, returning now"));
-            return;
-        }
+        server.addWriter(out);
+        server.display(new ServerNotificationMessage(userName + " joined chat server"));
 
         String message;
         while (true) {
