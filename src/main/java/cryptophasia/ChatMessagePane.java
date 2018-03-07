@@ -43,18 +43,6 @@ public class ChatMessagePane extends JScrollPane {
         this.userName = userName;
     }
 
-    public void appendMessage(String message) {
-        if (message == null) {
-            return;
-        } else if (message.equals(ChatServer.SHUTDOWN)) {
-            System.exit(1);
-        } else {
-            // Message is of unknown type
-
-            putText(message + "\n", DEFAULT_STYLE);
-        }
-    }
-
     public void appendMessage(ServerNotificationMessage message) {
         putText(" + " + message.getBody() + "\n", SERVER_NOTE_STYLE);
     }

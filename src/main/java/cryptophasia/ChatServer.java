@@ -13,9 +13,7 @@ import java.util.*;
 public class ChatServer extends Thread {
     public static final String SUBMITNAME = "SUBMITNAME";
     public static final String NAMEACCEPT = "NAMEACCEPT";
-    public static final String SHUTDOWN = "SHUTDOWN";
 
-    private int userCount = 0;
     private ArrayList<PrintWriter> printWriters = new ArrayList<PrintWriter>();
     private InetAddress address;
     private int port;
@@ -32,7 +30,6 @@ public class ChatServer extends Thread {
             while (true) {
                 try {
                     Socket socket = listener.accept();
-                    //ServerNotificationMessage connectionAcception = new ServerNotificationMessage("Socket connection accepted");
                     display(new ServerNotificationMessage("Socket connection accepted"));
                     new ChatClientHandler(socket, this).start();
                 } catch (IOException e) {
@@ -46,13 +43,6 @@ public class ChatServer extends Thread {
                 e.printStackTrace();
                 System.exit(1);
             }
-        }
-    }
-
-    public void display(String message) {
-        System.out.println(message);
-        for (PrintWriter writer : printWriters) {
-            writer.println(message);
         }
     }
 
@@ -82,6 +72,7 @@ public class ChatServer extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("ERROR: ChatServer was unable to open connection.");
+            System.err.println("Exiting now.");
             System.exit(1);
         }
         display(new ServerNotificationMessage("Server now listening on port: " + portNumber));

@@ -35,16 +35,16 @@ public class ChatClientGUI {
         configFrame();
         frame.setVisible(true);
 
-        String message;
+        String line;
         try {
-            message = inputStream.readLine();
-            if (message.equals(ChatServer.SUBMITNAME)) {
+            line = inputStream.readLine();
+            if (line.equals(ChatServer.SUBMITNAME)) {
                 do {
                     userName = userNameDialog();
                     messagePane.setUserName(userName);
                     outputStream.println(userName);
-                    message = inputStream.readLine();
-                } while(!message.equals(ChatServer.NAMEACCEPT));
+                    line = inputStream.readLine();
+                } while(!line.equals(ChatServer.NAMEACCEPT));
             }
             textField.setEditable(true);
             frame.setTitle("Chat Client - " + userName);
@@ -55,28 +55,20 @@ public class ChatClientGUI {
 
         while (true) {
             try {
-                message = inputStream.readLine();
-                AbstractMessage message2 = AbstractMessage.parse(message);
+                AbstractMessage message = AbstractMessage.parse(inputStream.readLine());
                 if (message == null) {
-                    appendMessage(new ServerNotificationMessage("Server is down"));
-                    textField.setEditable(false);
+                    appendMessage(new ServerNotificationMessage("WARNING: Message equals null. Server sending to " + userName));
+                    appendMessage(new ServerNotificationMessage("In ChatClientGUI loop, stopping loop for " + userName));
                     break;
-                }
-                if (message2 == null) {
-                    appendMessage(message);
                 } else {
-                    appendMessageAbstract(message2);
+                    appendMessageAbstract(message);
                 }
                 soundIndicator.play();
             } catch (IOException e) {
                 e.printStackTrace();
-                appendMessage("IOException - received unreadable message from server");
+                appendMessage(new ServerNotificationMessage("WARNING: IOException in ChatClientGUI loop reading from stream. (" + userName + " -> server)"));
             }
         }
-    }
-
-    private void appendMessage(String message) {
-        messagePane.appendMessage(message);
     }
 
     private void appendMessageAbstract(AbstractMessage message) {
