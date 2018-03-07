@@ -22,6 +22,14 @@ public class ServerNotificationMessage extends AbstractMessage {
         return new ServerNotificationMessage(message);
     }
 
+    public static boolean indicated(String transmission) {
+        if (transmission.startsWith(HEADER)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public String getBody() {
         return body;
     }

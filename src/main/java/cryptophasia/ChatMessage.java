@@ -27,6 +27,14 @@ public class ChatMessage extends AbstractMessage {
         return new ChatMessage(name, message);
     }
 
+    public static boolean indicated(String transmission) {
+        if (transmission.startsWith(HEADER)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public String getName() {
         return name;
     }

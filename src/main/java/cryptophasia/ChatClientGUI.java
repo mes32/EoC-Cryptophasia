@@ -37,27 +37,33 @@ public class ChatClientGUI {
 
         String line;
         try {
-            line = inputStream.readLine();
-            if (line.equals(ChatServer.SUBMITNAME)) {
-                do {
-                    userName = userNameDialog();
-                    messagePane.setUserName(userName);
-                    outputStream.println(userName);
-                    line = inputStream.readLine();
-                } while(!line.equals(ChatServer.NAMEACCEPT));
-            }
-            textField.setEditable(true);
-            frame.setTitle("Chat Client - " + userName);
+            //boolean accepted = false;
+            //do {
+                userName = userNameDialog();
+                SubmitUsernameMessage submitMessage = new SubmitUsernameMessage(userName);
+                outputStream.println(submitMessage.transmit());
+
+                line = inputStream.readLine();
+                if (!line.equals(ChatServer.NAMEACCEPT)) {
+                    appendMessage(new ServerNotificationMessage("Username '" + userName + "' was rejected by the server"));
+                    System.err.println("ERROR: Username was not accepted");
+                    System.exit(1);
+                }
+            //} while(!accepted);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
 
+        messagePane.setUserName(userName);
+        textField.setEditable(true);
+        frame.setTitle("Chat Client - " + userName);
+
         while (true) {
             try {
                 AbstractMessage message = AbstractMessage.parse(inputStream.readLine());
                 if (message == null) {
-                    appendMessage(new ServerNotificationMessage("WARNING: Message equals null. Server sending to " + userName));
+                    appendMessage(new ServerNotificationMessage("WARNING: Message equals null. (server -> " + userName + ")"));
                     appendMessage(new ServerNotificationMessage("In ChatClientGUI loop, stopping loop for " + userName));
                     break;
                 } else {

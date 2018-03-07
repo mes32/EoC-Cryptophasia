@@ -7,18 +7,23 @@
 package cryptophasia;
 
 public abstract class AbstractMessage {
-
-    protected static final String USER_NAME = "USER_NAME ";
-    protected static final String SERVER_NOTE = "SERVER_NOTE ";
+    
     protected static final String CHAT_MESSAGE = "CHAT_MESSAGE ";
+    protected static final String SERVER_NOTE = "SERVER_NOTE ";
+    protected static final String SUBMIT_USERNAME = "SUBMIT_USERNAME ";
+    protected static final String ACCEPT_USERNAME = "ACCEPT_USERNAME ";
 
     public static AbstractMessage parse(String text) {
         if (text == null) {
             return null;
-        } else if (text.startsWith(CHAT_MESSAGE)) {
+        } else if (ChatMessage.indicated(text)) {
             return ChatMessage.parse(text);
-        } else if (text.startsWith(SERVER_NOTE)) {
+        } else if (ServerNotificationMessage.indicated(text)) {
             return ServerNotificationMessage.parse(text);
+        } else if (SubmitUsernameMessage.indicated(text)) {
+            return SubmitUsernameMessage.parse(text);
+        } else if (AcceptUsernameMessage.indicated(text)) {
+            return AcceptUsernameMessage.parse(text);  
         } else {
             return null;
         }

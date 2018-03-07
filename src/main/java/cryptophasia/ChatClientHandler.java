@@ -23,13 +23,23 @@ public class ChatClientHandler extends Thread {
     }
 
     public void run() {
+        server.display(new ServerNotificationMessage("New CLIENT found"));
+        
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
+        } catch (IOException e) {
+            server.display(new ServerNotificationMessage("WARNING: Unable to start I/O for new client"));
+            server.display(new ServerNotificationMessage("In ChatClientHandler I/O setup, returning now"));
+            return;
+        }
 
-            server.display(new ServerNotificationMessage("New CLIENT found"));
-            out.println(ChatServer.SUBMITNAME);
-            userName = in.readLine();
+        try {
+            String transmission = in.readLine();
+            if (SubmitUsernameMessage.indicated(transmission)) {
+                SubmitUsernameMessage submission = SubmitUsernameMessage.parse(transmission);
+                userName = submission.getUsername();
+            }
 
             out.println(ChatServer.NAMEACCEPT);
             server.addWriter(out);
@@ -37,7 +47,7 @@ public class ChatClientHandler extends Thread {
 
         } catch (IOException e) {
             server.display(new ServerNotificationMessage("WARNING: New CLIENT was refused"));
-            server.display(new ServerNotificationMessage("In ChatClientHandler setup, returning"));
+            server.display(new ServerNotificationMessage("In ChatClientHandler username setup, returning now"));
             return;
         }
 
