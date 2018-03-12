@@ -11,20 +11,41 @@ import java.net.*;
 import java.util.*;
 import javax.swing.*;
 
-
 public class LaunchGame {
     private static final int SELECT_SERVER = 1;
     private static final int SELECT_CLIENT = 2;
 
-    public static void main(String[] args) {
-        showTitle();
-        int choice = menuPrompt();
+    private static final String TEST_SERVER = "-server";
+    private static final String TEST_CLIENT = "-client";
+    private static final InetAddress DEFAULT_ADDRESS = InetAddress.getLoopbackAddress();
+    private static final int DEFAULT_PORT = 9000;
 
-        try {
-            startSelected(choice);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
+    public static void main(String[] args) {
+        if (args.length == 1 && args[0].equals(TEST_SERVER)) {
+            try {
+                ChatServer server = new ChatServer(DEFAULT_ADDRESS, DEFAULT_PORT);
+                server.start();
+                new ChatClient(DEFAULT_ADDRESS, DEFAULT_PORT);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+        } else if (args.length == 1 && args[0].equals(TEST_CLIENT)) {
+            try {
+                new ChatClient(DEFAULT_ADDRESS, DEFAULT_PORT);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+        } else {
+            showTitle();
+            int choice = menuPrompt();
+            try {
+                startSelected(choice);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
         }
     }
 
