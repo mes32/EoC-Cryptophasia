@@ -12,6 +12,8 @@ import java.util.*;
 
 public class ChatServerConfiguration {
 
+    private static final int DEFAULT_PORT = 9000;
+
     private final InetAddress address = InetAddress.getLoopbackAddress();
 
     private InetAddress externalAddress;
@@ -46,9 +48,15 @@ public class ChatServerConfiguration {
             System.out.println("External IP Address: ###.###.###.###");
             System.out.print("Port Number: ");
             try {
-                int portNumber = scan.nextInt();
+                String portNumberString = scan.next();
+
+                if (portNumberString.equals("_")) {
+                    System.out.println();
+                    return DEFAULT_PORT;
+                }
+
                 System.out.println();
-                return portNumber;
+                return Integer.parseInt(portNumberString);
             } catch (InputMismatchException e) {
                 scan.nextLine();
             }

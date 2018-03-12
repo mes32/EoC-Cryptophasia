@@ -12,6 +12,8 @@ import java.util.*;
 
 public class ChatClient {
 
+    private static final int DEFAULT_PORT = 9000;
+
     private Socket socket;
     private BufferedReader inputStream;
     private PrintWriter outputStream;
@@ -59,8 +61,12 @@ public class ChatClient {
         Scanner scan = new Scanner(System.in);
         System.out.print("Server IP: ");
         String addressString = scan.next();
-        byte[] address = stringToAddress(addressString);
 
+        if (addressString.equals("_")) {
+            return InetAddress.getLoopbackAddress();
+        }
+
+        byte[] address = stringToAddress(addressString);
         InetAddress serverAddress = null;
         try {
             serverAddress = InetAddress.getByAddress(address);
@@ -75,8 +81,13 @@ public class ChatClient {
     private int serverPortNumberPrompt() {
         Scanner scan = new Scanner(System.in);
         System.out.print("Server Port: ");
-        int serverPortNumber = scan.nextInt();
-        return serverPortNumber;
+        String serverPortString = scan.next();
+
+        if (serverPortString.equals("_")) {
+            return DEFAULT_PORT;
+        }
+
+        return Integer.parseInt(serverPortString);
     }
 
     private byte[] stringToAddress(String string) {
