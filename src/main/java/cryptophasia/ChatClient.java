@@ -18,12 +18,12 @@ public class ChatClient {
     private BufferedReader inputStream;
     private PrintWriter outputStream;
 
-    ChatClient(InetAddress serverAddress, int serverPortNumber) {
+    ChatClient(InetAddress serverAddress, int serverPortNumber) throws IOException {
         connect(serverAddress, serverPortNumber);
         new ChatClientGUI(inputStream, outputStream);
     }
 
-    ChatClient() {
+    ChatClient() throws IOException {
         System.out.println();
         InetAddress serverAddress = serverAddressPrompt();
         int serverPortNumber = serverPortNumberPrompt();
@@ -33,31 +33,13 @@ public class ChatClient {
         new ChatClientGUI(inputStream, outputStream);
     }
 
-    private void connect(InetAddress serverAddress, int serverPortNumber) {
-        try {
-            socket = new Socket(serverAddress, serverPortNumber);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("ERROR: ChatClient was unable to connect with the server.");
-            System.exit(1);
-        }
-        try {
-            inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("ERROR: ChatClient was unable to obtain input stream from the server.");
-            System.exit(1);
-        }
-        try {
-            outputStream = new PrintWriter(socket.getOutputStream(), true);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("ERROR: ChatClient was unable to obtain output stream from the server.");
-            System.exit(1);
-        }
+    private void connect(InetAddress serverAddress, int serverPortNumber) throws IOException {
+        socket = new Socket(serverAddress, serverPortNumber);
+        inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        outputStream = new PrintWriter(socket.getOutputStream(), true);
     }
 
-    private InetAddress serverAddressPrompt() {
+    private InetAddress serverAddressPrompt() throws UnknownHostException {
         Scanner scan = new Scanner(System.in);
         System.out.print("Server IP: ");
         String addressString = scan.next();
@@ -68,13 +50,7 @@ public class ChatClient {
 
         byte[] address = stringToAddress(addressString);
         InetAddress serverAddress = null;
-        try {
-            serverAddress = InetAddress.getByAddress(address);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            System.err.println("ERROR: Unusable server IP address.");
-            System.exit(1);
-        }
+        serverAddress = InetAddress.getByAddress(address);
         return serverAddress;
     }
 
