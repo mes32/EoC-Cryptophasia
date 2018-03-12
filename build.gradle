@@ -10,8 +10,8 @@
 apply plugin: 'java'
 
 // Use Java 8
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.9
+targetCompatibility = 1.9
 
 // In this section you declare where to find the dependencies of your project
 repositories {
