@@ -19,7 +19,7 @@ public class ChatServer extends Thread {
     private int port;
     private ServerSocket listener;
 
-    ChatServer(InetAddress address, int port) {
+    ChatServer(InetAddress address, int port) throws IOException {
         this.address = address;
         this.port = port;
         listener = openConnection(port);
@@ -39,9 +39,8 @@ public class ChatServer extends Thread {
         } finally {
             try {
                 listener.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(1);
+            } catch (IOException ignore) {
+                // Ignoring IOException
             }
         }
     }
@@ -65,16 +64,8 @@ public class ChatServer extends Thread {
         printWriters.remove(writer);
     }
 
-    private ServerSocket openConnection(int portNumber) {
-        ServerSocket listener = null;
-        try {
-            listener = new ServerSocket(portNumber);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("ERROR: ChatServer was unable to open connection.");
-            System.err.println("Exiting now.");
-            System.exit(1);
-        }
+    private ServerSocket openConnection(int portNumber) throws IOException {
+        ServerSocket listener = new ServerSocket(portNumber);
         display(new ServerNotificationMessage("Server now listening on port: " + portNumber));
         return listener;
     }

@@ -19,7 +19,13 @@ public class LaunchGame {
     public static void main(String[] args) {
         showTitle();
         int choice = menuPrompt();
-        startSelected(choice);
+
+        try {
+            startSelected(choice);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     private static void showTitle() {
@@ -53,7 +59,7 @@ public class LaunchGame {
         }
     }
 
-    private static void startSelected(int choice) {
+    private static void startSelected(int choice) throws IOException {
         if (choice == SELECT_SERVER) {
             ChatServerConfiguration config = new ChatServerConfiguration();
             InetAddress address = config.getAddress();
@@ -61,7 +67,6 @@ public class LaunchGame {
 
             ChatServer server = new ChatServer(address, port);
             server.start();
-
             new ChatClient(address, port);
         } else if (choice == SELECT_CLIENT) {
             new ChatClient();
