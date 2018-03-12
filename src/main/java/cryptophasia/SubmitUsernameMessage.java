@@ -6,6 +6,8 @@
 
 package cryptophasia;
 
+import cryptophasia.exception.*;
+
 public class SubmitUsernameMessage extends AbstractMessage {
 
     private static final String HEADER = AbstractMessage.SUBMIT_USERNAME;
@@ -16,10 +18,14 @@ public class SubmitUsernameMessage extends AbstractMessage {
         this.username = username;
     }
 
-    public static SubmitUsernameMessage parse(String transmission) {
-        int index = HEADER.length();
-        String username = transmission.substring(index);
-        return new SubmitUsernameMessage(username);
+    public static SubmitUsernameMessage parse(String transmission) throws MalformedMessageException {
+        try {
+            int index = HEADER.length();
+            String username = transmission.substring(index);
+            return new SubmitUsernameMessage(username);
+        } catch(IndexOutOfBoundsException e) {
+            throw new MalformedMessageException("Could not parse SubmitUsernameMessage.", e);
+        }
     }
 
     public static boolean indicated(String transmission) {

@@ -6,6 +6,8 @@
 
 package cryptophasia;
 
+import cryptophasia.exception.*;
+
 public class ChatMessage extends AbstractMessage {
 
     private static final String HEADER = AbstractMessage.CHAT_MESSAGE;
@@ -18,13 +20,17 @@ public class ChatMessage extends AbstractMessage {
         this.message = message;
     }
 
-    public static ChatMessage parse(String transmission) {
-        int index = HEADER.length();
-        String tail = transmission.substring(index);
-        String[] tokens = tail.split("\\: ", 2);
-        String name = tokens[0];
-        String message = tokens[1];
-        return new ChatMessage(name, message);
+    public static ChatMessage parse(String transmission) throws MalformedMessageException {
+        try {
+            int index = HEADER.length();
+            String tail = transmission.substring(index);
+            String[] tokens = tail.split("\\: ", 2);
+            String name = tokens[0];
+            String message = tokens[1];
+            return new ChatMessage(name, message);
+        } catch (IndexOutOfBoundsException e) {
+            throw new MalformedMessageException("Could not parse ChatMessage.", e);
+        }
     }
 
     public static boolean indicated(String transmission) {

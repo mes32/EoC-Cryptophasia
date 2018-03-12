@@ -9,6 +9,8 @@ package cryptophasia;
 import java.io.*;
 import java.net.*;
 
+import cryptophasia.exception.*;
+
 public class ChatClientHandler extends Thread {
     private Socket socket;
     private ChatServer server;
@@ -47,6 +49,8 @@ public class ChatClientHandler extends Thread {
                 out.println(acceptance.transmit());
             } catch (IOException e) {
                 server.display(new ServerNotificationMessage("WARNING: IOException in ChatClientHandler username loop"));
+            } catch (MalformedMessageException e2) {
+                server.display(new ServerNotificationMessage("WARNING: MalformedMessageException in ChatClientHandler username loop"));
             }
         } while (!accepted);
 

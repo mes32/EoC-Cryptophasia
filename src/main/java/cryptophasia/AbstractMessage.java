@@ -6,6 +6,8 @@
 
 package cryptophasia;
 
+import cryptophasia.exception.*;
+
 public abstract class AbstractMessage {
     
     protected static final String CHAT_MESSAGE = "CHAT_MESSAGE ";
@@ -13,7 +15,7 @@ public abstract class AbstractMessage {
     protected static final String SUBMIT_USERNAME = "SUBMIT_USERNAME ";
     protected static final String ACCEPT_USERNAME = "ACCEPT_USERNAME ";
 
-    public static AbstractMessage parse(String text) {
+    public static AbstractMessage parse(String text) throws MalformedMessageException {
         if (text == null) {
             return null;
         } else if (ChatMessage.indicated(text)) {
@@ -25,7 +27,7 @@ public abstract class AbstractMessage {
         } else if (AcceptUsernameMessage.indicated(text)) {
             return AcceptUsernameMessage.parse(text);  
         } else {
-            return null;
+            throw new MalformedMessageException();
         }
     }
 

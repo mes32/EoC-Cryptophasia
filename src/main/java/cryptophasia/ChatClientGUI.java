@@ -15,6 +15,8 @@ import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.text.html.*;
 
+import cryptophasia.exception.*;
+
 public class ChatClientGUI {
 
     private BufferedReader inputStream;
@@ -51,9 +53,12 @@ public class ChatClientGUI {
                     appendMessageAbstract(message);
                 }
                 soundIndicator.play();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
                 appendMessage(new ServerNotificationMessage("WARNING: IOException in ChatClientGUI loop reading from stream. (" + userName + " -> server)"));
+            } catch (MalformedMessageException malformedMessageException) {
+                malformedMessageException.printStackTrace();
+                appendMessage(new ServerNotificationMessage("WARNING: MalformedMessageException in ChatClientGUI loop reading from stream. (" + userName + " -> server)"));
             }
         }
     }
