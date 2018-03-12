@@ -20,7 +20,8 @@ public class ChatClient {
 
     ChatClient(InetAddress serverAddress, int serverPortNumber) throws IOException {
         connect(serverAddress, serverPortNumber);
-        new ChatClientGUI(inputStream, outputStream);
+        ChatClientGUI gui = new ChatClientGUI(inputStream, outputStream);
+        gui.run();
     }
 
     ChatClient() throws IOException {
@@ -30,7 +31,8 @@ public class ChatClient {
         System.out.println();
 
         connect(serverAddress, serverPortNumber);
-        new ChatClientGUI(inputStream, outputStream);
+        ChatClientGUI gui = new ChatClientGUI(inputStream, outputStream);
+        gui.run();
     }
 
     private void connect(InetAddress serverAddress, int serverPortNumber) throws IOException {

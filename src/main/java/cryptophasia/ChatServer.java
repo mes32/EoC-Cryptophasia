@@ -11,8 +11,8 @@ import java.net.*;
 import java.util.*;
 
 public class ChatServer extends Thread {
-    public static final String SUBMITNAME = "SUBMITNAME";
-    public static final String NAMEACCEPT = "NAMEACCEPT";
+    //public static final String SUBMITNAME = "SUBMITNAME";
+    //public static final String NAMEACCEPT = "NAMEACCEPT";
 
     private ArrayList<PrintWriter> printWriters = new ArrayList<PrintWriter>();
     private InetAddress address;

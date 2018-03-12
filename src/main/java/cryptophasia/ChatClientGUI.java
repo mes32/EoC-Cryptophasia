@@ -27,7 +27,7 @@ public class ChatClientGUI {
     private JTextField textField = new JTextField(40);
     private ChatAudioIndicator soundIndicator = new ChatAudioIndicator();
 
-    ChatClientGUI(BufferedReader inputStream, PrintWriter outputStream) {
+    ChatClientGUI(BufferedReader inputStream, PrintWriter outputStream) throws IOException {
         this.inputStream = inputStream;
         this.outputStream = outputStream;
 
@@ -35,31 +35,11 @@ public class ChatClientGUI {
         configFrame();
         frame.setVisible(true);
 
-        String line;
-        try {
-            boolean accepted = false;
-            do {
-                userName = userNameDialog();
-                SubmitUsernameMessage submitMessage = new SubmitUsernameMessage(userName);
-                outputStream.println(submitMessage.transmit());
+        setUserName();
+    }
 
-                line = inputStream.readLine();
-                AcceptUsernameMessage acceptMessage = AcceptUsernameMessage.parse(line);
-                accepted = acceptMessage.isAccepted();
-                if (!accepted) {
-                    appendMessage(new ServerNotificationMessage("Username '" + userName + "' was rejected by the server"));
-                    appendMessage(new ServerNotificationMessage("Trying again"));
-                }
-            } while(!accepted);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        messagePane.setUserName(userName);
+    public void run() {
         textField.setEditable(true);
-        frame.setTitle("Chat Client - " + userName);
-
         while (true) {
             try {
                 AbstractMessage message = AbstractMessage.parse(inputStream.readLine());
@@ -76,22 +56,6 @@ public class ChatClientGUI {
                 appendMessage(new ServerNotificationMessage("WARNING: IOException in ChatClientGUI loop reading from stream. (" + userName + " -> server)"));
             }
         }
-    }
-
-    private void appendMessageAbstract(AbstractMessage message) {
-        if (message instanceof ServerNotificationMessage) {
-            appendMessage((ServerNotificationMessage) message);
-        } else if (message instanceof ChatMessage) {
-            appendMessage((ChatMessage) message);
-        }
-    }
-
-    private void appendMessage(ServerNotificationMessage message) {
-        messagePane.appendMessage(message);
-    }
-
-    private void appendMessage(ChatMessage message) {
-        messagePane.appendMessage(message);
     }
 
     private void configTextField(PrintWriter out) {
@@ -111,6 +75,42 @@ public class ChatClientGUI {
         frame.getContentPane().add(textField, BorderLayout.SOUTH);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    private void setUserName() throws IOException {
+        boolean accepted = false;
+        do {
+            userName = userNameDialog();
+            SubmitUsernameMessage submitMessage = new SubmitUsernameMessage(userName);
+            outputStream.println(submitMessage.transmit());
+
+            AcceptUsernameMessage acceptMessage = AcceptUsernameMessage.parse(inputStream.readLine());
+            accepted = acceptMessage.isAccepted();
+
+            if (!accepted) {
+                appendMessage(new ServerNotificationMessage("Username '" + userName + "' was rejected by the server"));
+                appendMessage(new ServerNotificationMessage("Trying again"));
+            }
+        } while(!accepted);
+
+        messagePane.setUserName(userName);
+        frame.setTitle("Chat Client - " + userName);
+    }
+
+    private void appendMessageAbstract(AbstractMessage message) {
+        if (message instanceof ServerNotificationMessage) {
+            appendMessage((ServerNotificationMessage) message);
+        } else if (message instanceof ChatMessage) {
+            appendMessage((ChatMessage) message);
+        }
+    }
+
+    private void appendMessage(ServerNotificationMessage message) {
+        messagePane.appendMessage(message);
+    }
+
+    private void appendMessage(ChatMessage message) {
+        messagePane.appendMessage(message);
     }
 
     private String userNameDialog() {
