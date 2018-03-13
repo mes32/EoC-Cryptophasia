@@ -17,59 +17,59 @@ public class ChatClientHandler extends Thread {
     private BufferedReader in;
     private PrintWriter out;
 
-    private String userName;
+    private String username;
 
-    public ChatClientHandler(Socket socket, ChatServer server) {
+    public ChatClientHandler(Socket socket, ChatServer server) throws IOException {
         this.socket = socket;
         this.server = server;
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        out = new PrintWriter(socket.getOutputStream(), true);
     }
 
     public void run() {
-        server.display(new ServerNotificationMessage("New CLIENT found"));
+        usernameLoop();
+        server.addWriter(out);
+        server.display(new ServerNotificationMessage(username + " joined chat server"));
+        mainLoop();
+    }
 
-        try {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
-        } catch (IOException e) {
-            server.display(new ServerNotificationMessage("WARNING: Unable to start I/O for new client"));
-            server.display(new ServerNotificationMessage("In ChatClientHandler I/O setup, returning now"));
-            return;
-        }
-
+    private void usernameLoop() {
+        String transmission;
         boolean accepted = false;
         do {
             try {
-                String transmission = in.readLine();
+                transmission = in.readLine();
                 SubmitUsernameMessage submission = SubmitUsernameMessage.parse(transmission);
-                userName = submission.getUsername();
+                username = submission.getUsername();
 
                 accepted = true;
 
                 AcceptUsernameMessage acceptance = new AcceptUsernameMessage(accepted);
                 out.println(acceptance.transmit());
             } catch (IOException e) {
-                server.display(new ServerNotificationMessage("WARNING: IOException in ChatClientHandler username loop"));
+                server.display(new ServerNotificationMessage("WARNING: IOException in ChatClientHandler usernameLoop()"));
             } catch (MalformedMessageException e2) {
-                server.display(new ServerNotificationMessage("WARNING: MalformedMessageException in ChatClientHandler username loop"));
+                server.display(new ServerNotificationMessage("WARNING: MalformedMessageException in ChatClientHandler usernameLoop()"));
             }
         } while (!accepted);
+    }
 
-        server.addWriter(out);
-        server.display(new ServerNotificationMessage(userName + " joined chat server"));
-
-        String message;
+    private void mainLoop() {
+        String transmission;
         while (true) {
             try {
-                message = in.readLine();
-                if (message == null) {
-                    server.display(new ServerNotificationMessage(userName + " left chat server"));
+                transmission = in.readLine();
+                if (transmission == null) {
+                    server.display(new ServerNotificationMessage(username + " left chat server"));
                     server.removeWriter(out);
                     break;
                 } else {
-                    server.display(new ChatMessage(userName, message));
+                    // TODO: For now this assumes all incomming transmissions are chat messages
+                    String message = transmission;
+                    server.display(new ChatMessage(username, message));
                 }
             } catch (IOException e) {
-                server.display(new ServerNotificationMessage("WARNING: IOException in ChatClientHandler loop reading from stream. (server -> " + userName + ")"));
+                server.display(new ServerNotificationMessage("WARNING: IOException in ChatClientHandler loop reading from stream. (server -> " + username + ")"));
             }
         }
     }

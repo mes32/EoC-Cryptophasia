@@ -7,6 +7,8 @@
 
 package cryptophasia;
 
+import cryptophasia.exception.*;
+
 public class AcceptUsernameMessage extends AbstractMessage {
 
     private static final String HEADER = AbstractMessage.ACCEPT_USERNAME;
@@ -19,13 +21,17 @@ public class AcceptUsernameMessage extends AbstractMessage {
         this.accepted = accepted;
     }
 
-    public static AcceptUsernameMessage parse(String transmission) {
-        int index = HEADER.length();
-        String accepted = transmission.substring(index);
-        if (accepted.equals(TRUE)) {
-            return new AcceptUsernameMessage(true);
-        } else {
-            return new AcceptUsernameMessage(false);
+    public static AcceptUsernameMessage parse(String transmission) throws MalformedMessageException {
+        try {
+            int index = HEADER.length();
+            String accepted = transmission.substring(index);
+            if (accepted.equals(TRUE)) {
+                return new AcceptUsernameMessage(true);
+            } else {
+                return new AcceptUsernameMessage(false);
+            }
+        } catch (IndexOutOfBoundsException e) {
+            throw new MalformedMessageException("Could not parse AcceptUsernameMessage.", e);
         }
     }
 

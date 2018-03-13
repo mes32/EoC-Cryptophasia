@@ -28,10 +28,10 @@ public class ChatServer extends Thread {
             while (true) {
                 try {
                     Socket socket = listener.accept();
-                    display(new ServerNotificationMessage("Socket connection accepted"));
                     new ChatClientHandler(socket, this).start();
+                    display(new ServerNotificationMessage("New client connected"));
                 } catch (IOException e) {
-                    display(new ServerNotificationMessage("Socket connection refused"));
+                    display(new ServerNotificationMessage("New client refused"));
                 }
             }
         } finally {

@@ -94,11 +94,16 @@ public class ChatClientGUI {
             do {
                 userName = userNameDialog();
             } while(userName == null || userName.equals(""));
+
             SubmitUsernameMessage submitMessage = new SubmitUsernameMessage(userName);
             outputStream.println(submitMessage.transmit());
 
-            AcceptUsernameMessage acceptMessage = AcceptUsernameMessage.parse(inputStream.readLine());
-            accepted = acceptMessage.isAccepted();
+            try {
+                AcceptUsernameMessage acceptMessage = AcceptUsernameMessage.parse(inputStream.readLine());
+                accepted = acceptMessage.isAccepted();
+            } catch (IOException | MalformedMessageException e) {
+                accepted = false;
+            }
 
             if (!accepted) {
                 appendMessage(new ServerNotificationMessage("Username '" + userName + "' was rejected by the server"));
