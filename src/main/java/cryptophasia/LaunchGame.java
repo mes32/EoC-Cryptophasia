@@ -15,37 +15,43 @@ public class LaunchGame {
     private static final int SELECT_SERVER = 1;
     private static final int SELECT_CLIENT = 2;
 
-    private static final String TEST_SERVER = "-server";
-    private static final String TEST_CLIENT = "-client";
+    private static final String TEST_SERVER_FLAG = "-server";
+    private static final String TEST_CLIENT_FLAG = "-client";
     private static final InetAddress DEFAULT_ADDRESS = InetAddress.getLoopbackAddress();
     private static final int DEFAULT_PORT = 9000;
 
     public static void main(String[] args) {
-        if (args.length == 1 && args[0].equals(TEST_SERVER)) {
-            try {
-                ChatServer server = new ChatServer(DEFAULT_ADDRESS, DEFAULT_PORT);
-                server.start();
-                new ChatClient(DEFAULT_ADDRESS, DEFAULT_PORT);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(1);
+        try {
+            if (args.length != 1) {
+                menu();
+            } else if (args[0].equals(TEST_SERVER_FLAG)) {
+                startDefaultServer();
+            } else if (args[0].equals(TEST_CLIENT_FLAG)) {
+                startDefaultClient();
             }
-        } else if (args.length == 1 && args[0].equals(TEST_CLIENT)) {
-            try {
-                new ChatClient(DEFAULT_ADDRESS, DEFAULT_PORT);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        } else {
-            showTitle();
-            int choice = menuPrompt();
-            try {
-                startSelected(choice);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private static void menu() throws IOException {
+        showTitle();
+        int choice = menuPrompt();
+        if (choice == SELECT_SERVER) {
+            InetAddress address = InetAddress.getLoopbackAddress();
+            int port = StartupPrompt.serverPortNumberPrompt();
+
+            ChatServer server = new ChatServer(address, port);
+            server.start();
+            new ChatClientGUI(address, port);
+        } else if (choice == SELECT_CLIENT) {
+            System.out.println();
+            InetAddress serverAddress = StartupPrompt.clientAddressPrompt();
+            int serverPortNumber = StartupPrompt.clientPortNumberPrompt();
+            System.out.println();
+
+            new ChatClientGUI(serverAddress, serverPortNumber);
         }
     }
 
@@ -80,17 +86,13 @@ public class LaunchGame {
         }
     }
 
-    private static void startSelected(int choice) throws IOException {
-        if (choice == SELECT_SERVER) {
-            ChatServerConfiguration config = new ChatServerConfiguration();
-            InetAddress address = config.getAddress();
-            int port = config.getPortNumber();
+    private static void startDefaultServer() throws IOException {
+        ChatServer server = new ChatServer(DEFAULT_ADDRESS, DEFAULT_PORT);
+        server.start();
+        new ChatClientGUI(DEFAULT_ADDRESS, DEFAULT_PORT);
+    }
 
-            ChatServer server = new ChatServer(address, port);
-            server.start();
-            new ChatClient(address, port);
-        } else if (choice == SELECT_CLIENT) {
-            new ChatClient();
-        }
+    private static void startDefaultClient() throws IOException {
+        new ChatClientGUI(DEFAULT_ADDRESS, DEFAULT_PORT);
     }
 }

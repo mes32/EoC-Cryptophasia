@@ -29,15 +29,21 @@ public class ChatClientGUI {
     private JTextField textField = new JTextField(40);
     private ChatAudioIndicator soundIndicator = new ChatAudioIndicator();
 
-    ChatClientGUI(BufferedReader inputStream, PrintWriter outputStream) throws IOException {
-        this.inputStream = inputStream;
-        this.outputStream = outputStream;
+    ChatClientGUI(InetAddress serverAddress, int serverPortNumber) throws IOException {
+        connect(serverAddress, serverPortNumber);
 
         configTextField(outputStream);
         configFrame();
         frame.setVisible(true);
+        setUserName();        
 
-        setUserName();
+        run();
+    }
+
+    private void connect(InetAddress serverAddress, int serverPortNumber) throws IOException {
+        Socket socket = new Socket(serverAddress, serverPortNumber);
+        inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        outputStream = new PrintWriter(socket.getOutputStream(), true);
     }
 
     public void run() {
