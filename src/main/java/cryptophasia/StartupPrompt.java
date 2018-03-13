@@ -12,22 +12,35 @@ import java.util.*;
 
 public abstract class StartupPrompt {
 
-    public static InetAddress clientAddressPrompt() throws UnknownHostException {
+    public static InetAddress clientAddressPrompt() {
         Scanner scan = new Scanner(System.in);
-        System.out.print("Server IP: ");
-        String addressString = scan.next();
 
-        byte[] address = stringToAddress(addressString);
-        InetAddress serverAddress = null;
-        serverAddress = InetAddress.getByAddress(address);
-        return serverAddress;
+        while (true) {
+            try {
+                System.out.print("Server IP: ");
+                String addressString = scan.next();
+
+                byte[] address = stringToAddress(addressString);
+                InetAddress serverAddress = null;
+                serverAddress = InetAddress.getByAddress(address);
+                return serverAddress;
+            } catch(NumberFormatException | UnknownHostException e) {
+                scan.nextLine();
+            }
+        }
     }
 
     public static int clientPortNumberPrompt() {
         Scanner scan = new Scanner(System.in);
-        System.out.print("Server Port: ");
-        int serverPortNumber = scan.nextInt();
-        return serverPortNumber;
+        while (true) {
+            try {
+                System.out.print("Server Port: ");
+                int serverPortNumber = scan.nextInt();
+                return serverPortNumber;
+            } catch(InputMismatchException e) {
+                scan.nextLine();
+            }
+        }
     }
 
     private static byte[] stringToAddress(String string) {
