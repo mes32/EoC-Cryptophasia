@@ -62,8 +62,7 @@ public class ChatClientHandler extends Thread {
             try {
                 message = in.readLine();
                 if (message == null) {
-                    server.display(new ServerNotificationMessage("WARNING: Message equals null. Sender is " + userName));
-                    server.display(new ServerNotificationMessage("In ChatClientHandler loop, removing output stream and stopping loop for " + userName));
+                    server.display(new ServerNotificationMessage(userName + " left chat server"));
                     server.removeWriter(out);
                     break;
                 } else {

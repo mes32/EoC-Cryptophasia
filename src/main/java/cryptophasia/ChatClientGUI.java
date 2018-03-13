@@ -52,8 +52,8 @@ public class ChatClientGUI {
             try {
                 AbstractMessage message = AbstractMessage.parse(inputStream.readLine());
                 if (message == null) {
-                    appendMessage(new ServerNotificationMessage("WARNING: Message equals null. (server -> " + userName + ")"));
-                    appendMessage(new ServerNotificationMessage("In ChatClientGUI loop, stopping loop for " + userName));
+                    appendMessage(new ServerNotificationMessage("Server shutdown"));
+                    // TODO: textField.setEditable(false);
                     break;
                 } else {
                     appendMessageAbstract(message);
