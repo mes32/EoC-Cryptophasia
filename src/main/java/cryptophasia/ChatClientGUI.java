@@ -53,7 +53,7 @@ public class ChatClientGUI {
                 AbstractMessage message = AbstractMessage.parse(inputStream.readLine());
                 if (message == null) {
                     appendMessage(new ServerNotificationMessage("Server shutdown"));
-                    // TODO: textField.setEditable(false);
+                    textField.setEditable(false);
                     break;
                 } else {
                     appendMessageAbstract(message);
