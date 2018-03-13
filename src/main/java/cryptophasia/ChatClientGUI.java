@@ -91,7 +91,9 @@ public class ChatClientGUI {
     private void setUserName() throws IOException {
         boolean accepted = false;
         do {
-            userName = userNameDialog();
+            do {
+                userName = userNameDialog();
+            } while(userName == null || userName.equals(""));
             SubmitUsernameMessage submitMessage = new SubmitUsernameMessage(userName);
             outputStream.println(submitMessage.transmit());
 
