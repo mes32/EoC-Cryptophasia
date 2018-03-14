@@ -10,6 +10,8 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.text.*;
 
+import cryptophasia.networking.transmission.*;
+
 public class ChatMessagePane extends JScrollPane {
 
     private static final String FONT_FAMILY = "Lucida Console";

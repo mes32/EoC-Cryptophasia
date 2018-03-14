@@ -5,7 +5,7 @@
     whether the username is valid
  */
 
-package cryptophasia;
+package cryptophasia.networking.transmission;
 
 import cryptophasia.exception.*;
 
@@ -17,7 +17,7 @@ public class AcceptUsernameMessage extends AbstractMessage {
 
     private boolean accepted;
 
-    AcceptUsernameMessage(boolean accepted) {
+    public AcceptUsernameMessage(boolean accepted) {
         this.accepted = accepted;
     }
 

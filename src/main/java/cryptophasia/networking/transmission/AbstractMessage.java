@@ -4,7 +4,7 @@
     A message sent between ChatClient and ChatServer
  */
 
-package cryptophasia;
+package cryptophasia.networking.transmission;
 
 import cryptophasia.exception.*;
 

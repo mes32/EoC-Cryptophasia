@@ -4,7 +4,7 @@
     A message passing between clients on the chat channel
  */
 
-package cryptophasia;
+package cryptophasia.networking.transmission;
 
 import cryptophasia.exception.*;
 
@@ -15,7 +15,7 @@ public class ChatMessage extends AbstractMessage {
     private String name;
     private String message;
 
-    ChatMessage(String name, String message) {
+    public ChatMessage(String name, String message) {
         this.name = name;
         this.message = message;
     }

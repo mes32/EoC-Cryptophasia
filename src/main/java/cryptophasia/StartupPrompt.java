@@ -47,7 +47,7 @@ public abstract class StartupPrompt {
         String[] digits = string.split("\\.");
         byte[] address = new byte[digits.length];
         for (int i = 0; i < digits.length; i++) {
-            Integer current = new Integer(digits[i]);
+            Integer current = Integer.valueOf(digits[i]);
             address[i] = current.byteValue();
         }
         return address;

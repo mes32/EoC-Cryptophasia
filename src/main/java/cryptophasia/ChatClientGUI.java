@@ -17,6 +17,7 @@ import javax.swing.text.html.*;
 
 import cryptophasia.exception.*;
 import cryptophasia.networking.*;
+import cryptophasia.networking.transmission.*;
 
 public class ChatClientGUI {
 

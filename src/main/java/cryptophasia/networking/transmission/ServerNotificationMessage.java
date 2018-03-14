@@ -4,7 +4,7 @@
     A notification relating to the server ChatServer
  */
 
-package cryptophasia;
+package cryptophasia.networking.transmission;
 
 import cryptophasia.exception.*;
 
@@ -14,7 +14,7 @@ public class ServerNotificationMessage extends AbstractMessage {
 
     private String body;
 
-    ServerNotificationMessage(String message) {
+    public ServerNotificationMessage(String message) {
         body = message;
     }
 

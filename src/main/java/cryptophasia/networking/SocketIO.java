@@ -27,14 +27,17 @@ public class SocketIO {
     }
 
     public PrintWriter getOutputStream() {
+        // TODO: This method should not need to be exposed
         return out;
     }
 
     public String readLine() throws IOException {
+        // TODO: This method should not need to be exposed
         return in.readLine();
     }
 
     public void println(String line) { 
+        // TODO: This method should not need to be exposed
         out.println(line);
     }
 }

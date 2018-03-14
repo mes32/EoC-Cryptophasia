@@ -4,7 +4,7 @@
     A message where the client submits a desired username to the server
  */
 
-package cryptophasia;
+package cryptophasia.networking.transmission;
 
 import cryptophasia.exception.*;
 
@@ -14,7 +14,7 @@ public class SubmitUsernameMessage extends AbstractMessage {
 
     private String username;
 
-    SubmitUsernameMessage(String username) {
+    public SubmitUsernameMessage(String username) {
         this.username = username;
     }
 

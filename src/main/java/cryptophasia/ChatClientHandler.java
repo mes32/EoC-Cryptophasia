@@ -11,6 +11,7 @@ import java.net.*;
 
 import cryptophasia.exception.*;
 import cryptophasia.networking.*;
+import cryptophasia.networking.transmission.*;
 
 public class ChatClientHandler extends Thread {
     
