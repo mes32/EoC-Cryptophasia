@@ -13,23 +13,19 @@ import cryptophasia.exception.*;
 import cryptophasia.networking.*;
 
 public class ChatClientHandler extends Thread {
+    
     private SocketIO socket;
     private ChatServer server;
-    private BufferedReader in;
-    private PrintWriter out;
-
     private String username;
 
     public ChatClientHandler(SocketIO socket, ChatServer server) throws IOException {
         this.socket = socket;
         this.server = server;
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        out = new PrintWriter(socket.getOutputStream(), true);
     }
 
     public void run() {
         usernameLoop();
-        server.addWriter(out);
+        server.addWriter(socket.getOutputStream());
         server.display(new ServerNotificationMessage(username + " joined chat server"));
         mainLoop();
     }
@@ -39,14 +35,14 @@ public class ChatClientHandler extends Thread {
         boolean accepted = false;
         do {
             try {
-                transmission = in.readLine();
+                transmission = socket.readLine();
                 SubmitUsernameMessage submission = SubmitUsernameMessage.parse(transmission);
                 username = submission.getUsername();
 
                 accepted = true;
 
                 AcceptUsernameMessage acceptance = new AcceptUsernameMessage(accepted);
-                out.println(acceptance.transmit());
+                socket.println(acceptance.transmit());
             } catch (IOException e) {
                 server.display(new ServerNotificationMessage("WARNING: IOException in ChatClientHandler usernameLoop()"));
             } catch (MalformedMessageException e2) {
@@ -59,10 +55,10 @@ public class ChatClientHandler extends Thread {
         String transmission;
         while (true) {
             try {
-                transmission = in.readLine();
+                transmission = socket.readLine();
                 if (transmission == null) {
                     server.display(new ServerNotificationMessage(username + " left chat server"));
-                    server.removeWriter(out);
+                    server.removeWriter(socket.getOutputStream());
                     break;
                 } else {
                     // TODO: For now this assumes all incomming transmissions are chat messages

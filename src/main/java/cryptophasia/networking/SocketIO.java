@@ -14,25 +14,27 @@ public class SocketIO {
     private BufferedReader in;
     private PrintWriter out;
 
-    public SocketIO(Socket socket) {
+    public SocketIO(Socket socket) throws IOException {
         this.socket = socket;
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        out = new PrintWriter(socket.getOutputStream(), true);
     }
 
-    public InputStream getInputStream() throws IOException {
-        // TODO: Need for this should be eliminated
-        return socket.getInputStream();
+    public SocketIO(InetAddress address, int port) throws IOException {
+        socket = new Socket(address, port);
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        out = new PrintWriter(socket.getOutputStream(), true);
     }
 
-    public OutputStream getOutputStream() throws IOException {
-        // TODO: Need for this should be eliminated
-        return socket.getOutputStream();
+    public PrintWriter getOutputStream() {
+        return out;
     }
 
-    public String read() {
-        return "";
+    public String readLine() throws IOException {
+        return in.readLine();
     }
 
-    public void write(String string) {
-        
+    public void println(String line) { 
+        out.println(line);
     }
 }

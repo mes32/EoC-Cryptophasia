@@ -20,9 +20,7 @@ import cryptophasia.networking.*;
 
 public class ChatClientGUI {
 
-    private BufferedReader inputStream;
-    private PrintWriter outputStream;
-
+    private SocketIO socket;
     private String userName;
     private JFrame frame = new JFrame("Chat Client");
 
@@ -31,9 +29,9 @@ public class ChatClientGUI {
     private ChatAudioIndicator soundIndicator = new ChatAudioIndicator();
 
     ChatClientGUI(InetAddress serverAddress, int serverPortNumber) throws IOException {
-        connect(serverAddress, serverPortNumber);
+        socket = new SocketIO(serverAddress, serverPortNumber);
 
-        configTextField(outputStream);
+        configTextField(socket.getOutputStream());
         configFrame();
         frame.setVisible(true);
         setUserName();        
@@ -41,17 +39,11 @@ public class ChatClientGUI {
         run();
     }
 
-    private void connect(InetAddress serverAddress, int serverPortNumber) throws IOException {
-        Socket socket = new Socket(serverAddress, serverPortNumber);
-        inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        outputStream = new PrintWriter(socket.getOutputStream(), true);
-    }
-
     public void run() {
         textField.setEditable(true);
         while (true) {
             try {
-                AbstractMessage message = AbstractMessage.parse(inputStream.readLine());
+                AbstractMessage message = AbstractMessage.parse(socket.readLine());
                 if (message == null) {
                     appendMessage(new ServerNotificationMessage("Server shutdown"));
                     textField.setEditable(false);
@@ -97,10 +89,10 @@ public class ChatClientGUI {
             } while(userName == null || userName.equals(""));
 
             SubmitUsernameMessage submitMessage = new SubmitUsernameMessage(userName);
-            outputStream.println(submitMessage.transmit());
+            socket.println(submitMessage.transmit());
 
             try {
-                AcceptUsernameMessage acceptMessage = AcceptUsernameMessage.parse(inputStream.readLine());
+                AcceptUsernameMessage acceptMessage = AcceptUsernameMessage.parse(socket.readLine());
                 accepted = acceptMessage.isAccepted();
             } catch (IOException | MalformedMessageException e) {
                 accepted = false;
