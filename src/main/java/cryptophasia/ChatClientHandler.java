@@ -10,16 +10,17 @@ import java.io.*;
 import java.net.*;
 
 import cryptophasia.exception.*;
+import cryptophasia.networking.*;
 
 public class ChatClientHandler extends Thread {
-    private Socket socket;
+    private SocketIO socket;
     private ChatServer server;
     private BufferedReader in;
     private PrintWriter out;
 
     private String username;
 
-    public ChatClientHandler(Socket socket, ChatServer server) throws IOException {
+    public ChatClientHandler(SocketIO socket, ChatServer server) throws IOException {
         this.socket = socket;
         this.server = server;
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

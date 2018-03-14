@@ -14,7 +14,7 @@ public class ServerSocketIO {
 
     private ServerSocket server;
 
-    ServerSocketIO(int port) throws IOException {
+    public ServerSocketIO(int port) throws IOException {
         server = new ServerSocket(port);
     }
 

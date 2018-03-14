@@ -10,24 +10,26 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import cryptophasia.networking.*;
+
 public class ChatServer extends Thread {
 
     private ArrayList<PrintWriter> printWriters = new ArrayList<PrintWriter>();
     private InetAddress address;
     private int port;
-    private ServerSocket listener;
+    private ServerSocketIO listener;
 
     ChatServer(InetAddress address, int port) throws IOException {
         this.address = address;
         this.port = port;
-        listener = openConnection(port);
+        openListener(port);
     }
 
     public void run() {
         try {
             while (true) {
                 try {
-                    Socket socket = listener.accept();
+                    SocketIO socket = listener.accept();
                     new ChatClientHandler(socket, this).start();
                     display(new ServerNotificationMessage("New client connected"));
                 } catch (IOException e) {
@@ -62,9 +64,8 @@ public class ChatServer extends Thread {
         printWriters.remove(writer);
     }
 
-    private ServerSocket openConnection(int portNumber) throws IOException {
-        ServerSocket listener = new ServerSocket(portNumber);
+    private void openListener(int portNumber) throws IOException {
+        listener = new ServerSocketIO(portNumber);
         display(new ServerNotificationMessage("Server now listening on port: " + portNumber));
-        return listener;
     }
 }

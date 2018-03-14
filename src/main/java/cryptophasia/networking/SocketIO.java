@@ -18,6 +18,16 @@ public class SocketIO {
         this.socket = socket;
     }
 
+    public InputStream getInputStream() throws IOException {
+        // TODO: Need for this should be eliminated
+        return socket.getInputStream();
+    }
+
+    public OutputStream getOutputStream() throws IOException {
+        // TODO: Need for this should be eliminated
+        return socket.getOutputStream();
+    }
+
     public String read() {
         return "";
     }
