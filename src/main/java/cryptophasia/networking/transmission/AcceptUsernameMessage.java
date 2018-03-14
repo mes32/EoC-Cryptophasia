@@ -21,7 +21,7 @@ public class AcceptUsernameMessage extends AbstractMessage {
         this.accepted = accepted;
     }
 
-    public static AcceptUsernameMessage parse(String transmission) throws MalformedMessageException {
+    public static AcceptUsernameMessage parse(String transmission) throws MalformedTransmissionException {
         try {
             int index = HEADER.length();
             String accepted = transmission.substring(index);
@@ -31,7 +31,7 @@ public class AcceptUsernameMessage extends AbstractMessage {
                 return new AcceptUsernameMessage(false);
             }
         } catch (IndexOutOfBoundsException e) {
-            throw new MalformedMessageException("Could not parse AcceptUsernameMessage.", e);
+            throw new MalformedTransmissionException("Could not parse AcceptUsernameMessage.", e);
         }
     }
 

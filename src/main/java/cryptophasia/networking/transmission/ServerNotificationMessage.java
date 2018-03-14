@@ -18,13 +18,13 @@ public class ServerNotificationMessage extends AbstractMessage {
         body = message;
     }
 
-    public static ServerNotificationMessage parse(String transmission) throws MalformedMessageException {
+    public static ServerNotificationMessage parse(String transmission) throws MalformedTransmissionException {
         try {
             int index = HEADER.length();
             String message = transmission.substring(index);
             return new ServerNotificationMessage(message);
         } catch (IndexOutOfBoundsException e) {
-            throw new MalformedMessageException("Could not parse ServerNotificationMessage.", e);
+            throw new MalformedTransmissionException("Could not parse ServerNotificationMessage.", e);
         }
     }
 

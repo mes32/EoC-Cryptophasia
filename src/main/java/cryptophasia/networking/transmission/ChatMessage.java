@@ -20,7 +20,7 @@ public class ChatMessage extends AbstractMessage {
         this.message = message;
     }
 
-    public static ChatMessage parse(String transmission) throws MalformedMessageException {
+    public static ChatMessage parse(String transmission) throws MalformedTransmissionException {
         try {
             int index = HEADER.length();
             String tail = transmission.substring(index);
@@ -29,7 +29,7 @@ public class ChatMessage extends AbstractMessage {
             String message = tokens[1];
             return new ChatMessage(name, message);
         } catch (IndexOutOfBoundsException e) {
-            throw new MalformedMessageException("Could not parse ChatMessage.", e);
+            throw new MalformedTransmissionException("Could not parse ChatMessage.", e);
         }
     }
 

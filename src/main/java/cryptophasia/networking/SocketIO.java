@@ -9,6 +9,9 @@ package cryptophasia.networking;
 import java.io.*;
 import java.net.*;
 
+import cryptophasia.exception.*;
+import cryptophasia.networking.transmission.*;
+
 public class SocketIO {
     private Socket socket;
     private BufferedReader in;
@@ -24,6 +27,14 @@ public class SocketIO {
         socket = new Socket(address, port);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream(), true);
+    }
+
+    public void transmit(CryptophasiaTransmission transmission) {
+        out.println(transmission.encode());
+    }
+
+    public RequestUsername receive() throws IOException, MalformedTransmissionException {
+        return RequestUsername.decode(in.readLine());
     }
 
     public PrintWriter getOutputStream() {

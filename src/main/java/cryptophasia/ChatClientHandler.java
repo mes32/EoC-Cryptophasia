@@ -37,7 +37,7 @@ public class ChatClientHandler extends Thread {
         do {
             try {
                 transmission = socket.readLine();
-                SubmitUsernameMessage submission = SubmitUsernameMessage.parse(transmission);
+                RequestUsername submission = RequestUsername.decode(transmission);
                 username = submission.getUsername();
 
                 accepted = true;
@@ -46,8 +46,8 @@ public class ChatClientHandler extends Thread {
                 socket.println(acceptance.transmit());
             } catch (IOException e) {
                 server.display(new ServerNotificationMessage("WARNING: IOException in ChatClientHandler usernameLoop()"));
-            } catch (MalformedMessageException e2) {
-                server.display(new ServerNotificationMessage("WARNING: MalformedMessageException in ChatClientHandler usernameLoop()"));
+            } catch (MalformedTransmissionException e2) {
+                server.display(new ServerNotificationMessage("WARNING: MalformedTransmissionException in ChatClientHandler usernameLoop()"));
             }
         } while (!accepted);
     }

@@ -56,9 +56,9 @@ public class ChatClientGUI {
             } catch (IOException ioException) {
                 ioException.printStackTrace();
                 appendMessage(new ServerNotificationMessage("WARNING: IOException in ChatClientGUI loop reading from stream. (" + userName + " -> server)"));
-            } catch (MalformedMessageException malformedMessageException) {
+            } catch (MalformedTransmissionException malformedMessageException) {
                 malformedMessageException.printStackTrace();
-                appendMessage(new ServerNotificationMessage("WARNING: MalformedMessageException in ChatClientGUI loop reading from stream. (" + userName + " -> server)"));
+                appendMessage(new ServerNotificationMessage("WARNING: MalformedTransmissionException in ChatClientGUI loop reading from stream. (" + userName + " -> server)"));
             }
         }
     }
@@ -89,13 +89,14 @@ public class ChatClientGUI {
                 userName = userNameDialog();
             } while(userName == null || userName.equals(""));
 
-            SubmitUsernameMessage submitMessage = new SubmitUsernameMessage(userName);
-            socket.println(submitMessage.transmit());
+            RequestUsername request = new RequestUsername(userName);
+            socket.transmit(request);
+            accepted = request.accepted();
 
             try {
                 AcceptUsernameMessage acceptMessage = AcceptUsernameMessage.parse(socket.readLine());
                 accepted = acceptMessage.isAccepted();
-            } catch (IOException | MalformedMessageException e) {
+            } catch (IOException | MalformedTransmissionException e) {
                 accepted = false;
             }
 
