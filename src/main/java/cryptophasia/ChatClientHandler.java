@@ -36,14 +36,13 @@ public class ChatClientHandler extends Thread {
         boolean accepted = false;
         do {
             try {
-                transmission = socket.readLine();
-                RequestUsername submission = RequestUsername.decode(transmission);
-                username = submission.getUsername();
+                RequestUsername request = socket.receive();
+                username = request.getUsername();
 
+                // TODO: Lookup name
                 accepted = true;
 
-                AcceptUsernameMessage acceptance = new AcceptUsernameMessage(accepted);
-                socket.println(acceptance.transmit());
+                socket.accept(request, accepted);
             } catch (IOException e) {
                 server.display(new ServerNotificationMessage("WARNING: IOException in ChatClientHandler usernameLoop()"));
             } catch (MalformedTransmissionException e2) {

@@ -22,21 +22,19 @@ import cryptophasia.networking.transmission.*;
 public class ChatClientGUI {
 
     private SocketIO socket;
-    private String userName;
+    private String username;
     private JFrame frame = new JFrame("Chat Client");
 
     private ChatMessagePane messagePane = new ChatMessagePane();
     private JTextField textField = new JTextField(40);
     private ChatAudioIndicator soundIndicator = new ChatAudioIndicator();
 
-    ChatClientGUI(InetAddress serverAddress, int serverPortNumber) throws IOException {
-        socket = new SocketIO(serverAddress, serverPortNumber);
-
-        configTextField(socket.getOutputStream());
+    ChatClientGUI(InetAddress address, int port) throws IOException {
+        socket = new SocketIO(address, port);
         configFrame();
         frame.setVisible(true);
         setUserName();        
-
+        configTextField(socket.getOutputStream());
         run();
     }
 
@@ -55,10 +53,10 @@ public class ChatClientGUI {
                 soundIndicator.play();
             } catch (IOException ioException) {
                 ioException.printStackTrace();
-                appendMessage(new ServerNotificationMessage("WARNING: IOException in ChatClientGUI loop reading from stream. (" + userName + " -> server)"));
+                appendMessage(new ServerNotificationMessage("WARNING: IOException in ChatClientGUI loop reading from stream. (" + username + " -> server)"));
             } catch (MalformedTransmissionException malformedMessageException) {
                 malformedMessageException.printStackTrace();
-                appendMessage(new ServerNotificationMessage("WARNING: MalformedTransmissionException in ChatClientGUI loop reading from stream. (" + userName + " -> server)"));
+                appendMessage(new ServerNotificationMessage("WARNING: MalformedTransmissionException in ChatClientGUI loop reading from stream. (" + username + " -> server)"));
             }
         }
     }
@@ -84,30 +82,21 @@ public class ChatClientGUI {
 
     private void setUserName() throws IOException {
         boolean accepted = false;
-        do {
-            do {
-                userName = userNameDialog();
-            } while(userName == null || userName.equals(""));
-
-            RequestUsername request = new RequestUsername(userName);
+        while (true) {
+            username = userNameDialog();
+            RequestUsername request = new RequestUsername(username);
             socket.transmit(request);
-            accepted = request.accepted();
-
-            try {
-                AcceptUsernameMessage acceptMessage = AcceptUsernameMessage.parse(socket.readLine());
-                accepted = acceptMessage.isAccepted();
-            } catch (IOException | MalformedTransmissionException e) {
-                accepted = false;
-            }
-
-            if (!accepted) {
-                appendMessage(new ServerNotificationMessage("Username '" + userName + "' was rejected by the server"));
+            accepted = socket.isAccepted(request);
+            if (accepted) {
+                break;
+            } else {
+                appendMessage(new ServerNotificationMessage("Username '" + username + "' was rejected by the server"));
                 appendMessage(new ServerNotificationMessage("Trying again"));
             }
-        } while(!accepted);
+        }
 
-        messagePane.setUserName(userName);
-        frame.setTitle("Chat Client - " + userName);
+        messagePane.setUserName(username);
+        frame.setTitle("Chat Client - " + username);
     }
 
     private void appendMessageAbstract(AbstractMessage message) {
@@ -127,11 +116,14 @@ public class ChatClientGUI {
     }
 
     private String userNameDialog() {
-        String userName = JOptionPane.showInputDialog(
-            frame,
-            "Enter username:",
-            "Username Dialog",
-            JOptionPane.PLAIN_MESSAGE);
-        return userName;
+        String username;
+        do {
+            username = JOptionPane.showInputDialog(
+                frame,
+                "Enter username:",
+                "Username Dialog",
+                JOptionPane.PLAIN_MESSAGE);
+        } while(username == null || username.equals(""));
+        return username;
     }
 }

@@ -37,6 +37,14 @@ public class SocketIO {
         return RequestUsername.decode(in.readLine());
     }
 
+    public void accept(CryptophasiaTransmission transmission, boolean accept) {
+        out.println(transmission.replyWithAccept(accept));
+    }
+
+    public boolean isAccepted(CryptophasiaTransmission transmission) throws IOException {
+        return transmission.isAccepted(in.readLine());
+    }
+
     public PrintWriter getOutputStream() {
         // TODO: This method should not need to be exposed
         return out;
